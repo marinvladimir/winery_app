@@ -81,7 +81,7 @@ const ContactForm = styled.form`
   background-repeat: no-repeat;
 
   h3 {
-  color: #5c5c5c;
+  color: white;
   font-family: 'Assistant', sans-serif;
   margin: 0rem;
   font-size: 1.2rem;
@@ -101,7 +101,7 @@ h3::after {
 }
 
   label {
-    color: #5c5c5c;
+    color: white;
     font-family: 'Assistant', sans-serif;
   }
 
@@ -126,7 +126,7 @@ const LanguageButton = styled.button`
 `;
 
 const SubmitButton = styled.button<ButtonProps>`
-  background: gray;
+    background: #855f5f;
     color: white;
     padding: 0.8rem;
     border: none;
@@ -135,7 +135,7 @@ const SubmitButton = styled.button<ButtonProps>`
     transition: all 0.3s ease-in-out;
 
     &:hover {
-       background: ${({ $isDisabled }) => ($isDisabled ? "gray" : "#c5c5c5")};
+       background: ${({ $isDisabled }) => ($isDisabled ? "#855f5f" : "#c5c5c5")};
     transform: ${({ $isDisabled }) => ($isDisabled ? "none" : "scale(1.05)")};
     box-shadow: ${({ $isDisabled }) => ($isDisabled ? "none" : "0 4px 10px rgba(0, 91, 181, 0.3)")};
     }
