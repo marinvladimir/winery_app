@@ -67,14 +67,6 @@ const Separator = styled.div`
   border-radius: 2px;
 `;
 
-const ParagraphSeparator = styled.div`
-  width: 60%;
-  height: 2px;
-  background: rgba(138, 44, 44, 0.5);
-  margin: 15px auto;
-  border-radius: 2px;
-`;
-
 const TourWrapper = styled.div`
   max-width: 800px;
   text-align: center;
