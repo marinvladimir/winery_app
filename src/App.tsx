@@ -5,6 +5,9 @@ import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import WelcomePage from "./pages/WelcomePage";
 import { LanguageProvider } from "./context/i18n";
+import TourPage from "./pages/TourPage";
+import GalleryPage from "./pages/GalleryPage";
+import NoviPage from "./pages/NoviPage";
 
 function App() {
   return (
@@ -13,10 +16,9 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" element={<WelcomePage />} />
-            {/* 
-          <Route path="/music" element={<MusicPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/about" element={<AboutPage />} /> */}
+            <Route path="/tour" element={<TourPage />} />
+            <Route path="/gallery" element={<GalleryPage />} />
+            <Route path="/kastel-novi" element={<NoviPage />} />
           </Routes>
         </Router>
         <ToastContainer position="top-right" autoClose={3000} />

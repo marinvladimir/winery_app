@@ -3,7 +3,7 @@ import styled from "styled-components";
 import AboutSection from "../components/AboutSection";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { useIntl, FormattedMessage } from "react-intl";
-import { useLanguage } from "../context/i18n";
+// import { useLanguage } from "../context/i18n";
 import "leaflet/dist/leaflet.css";
 import emailjs from "emailjs-com";
 import {
@@ -75,7 +75,7 @@ const ContactForm = styled.form`
   background: white;
   transition: all 0.3s ease-in-out;
 
-   background-image: url("/assets/wooden.jpg");
+  background-image: url("/assets/wooden.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -117,7 +117,7 @@ h3::after {
   }
 `;
 
-const LanguageButton = styled.button`
+export const LanguageButton = styled.button`
   background: none;
   border: none;
   font-weight: bold;
@@ -188,7 +188,7 @@ interface FormData {
 
 const AboutPage = () => {
   const { formatMessage } = useIntl();
-  const { switchLanguage } = useLanguage();
+  // const { switchLanguage } = useLanguage();
   const [visitorCount, setVisitorCount] = useState<number>(0);
 
   useEffect(() => {
@@ -257,8 +257,8 @@ const AboutPage = () => {
       <ContentWrapper>
         <AboutSection />
         <RightSection>
-        <ContactInfo>
-            <div>
+        {/* <ContactInfo> */}
+            {/* <div>
               <LanguageButton onClick={() => switchLanguage("hr")}>
                 <FormattedMessage id="language.hr" />
               </LanguageButton> 
@@ -266,8 +266,8 @@ const AboutPage = () => {
               <LanguageButton onClick={() => switchLanguage("en")}>
                 <FormattedMessage id="language.en" />
               </LanguageButton>
-            </div>
-          </ContactInfo>
+            </div> */}
+          {/* </ContactInfo> */}
           <ContactInfo>
             <div style={{ backgroundColor: "#f5f5f4", padding: "20px" }}>
               <div>

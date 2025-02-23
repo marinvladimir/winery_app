@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import styled from "styled-components";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
+import { useLanguage } from "../context/i18n";
+import { LanguageButton } from "../pages/AboutPage";
 
 const Carousel = () => {
   const { formatMessage } = useIntl()
@@ -19,15 +21,32 @@ const Carousel = () => {
 
     return () => clearInterval(interval);
   }, []);
+  const { switchLanguage } = useLanguage();
 
   return (
     <HeaderContainer>
       <HeaderContent>
         <Logo src="assets/logo.png" />
+                        <div style={{color:'white'}}>
+              <LanguageButton onClick={() => switchLanguage("hr")}>
+                <FormattedMessage id="language.hr" />
+              </LanguageButton> 
+              | 
+              <LanguageButton onClick={() => switchLanguage("en")}>
+                <FormattedMessage id="language.en" />
+              </LanguageButton>
+            </div>
         <ContactInfo>098 9932 710 &nbsp; | &nbsp; anita_kuzmanic@yahoo.com</ContactInfo>
         <Nav>
-          {[formatMessage({ id: "welcome.title" }), formatMessage({ id: "header.link2" }), formatMessage({ id: "header.link3" }), 'Kaštel Novi'].map((item, i) => (
-            <NavItem key={i} href="#">{item}</NavItem>
+          {[
+            { label: formatMessage({ id: "welcome.title" }), path: "#/" },
+            { label: formatMessage({ id: "header.link2" }), path: "#/tour" },
+            { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
+            { label: "Kaštel Novi", path: "#/kastel-novi" }
+          ].map((item, i) => (
+            <NavItem key={i} href={item.path}>
+              {item.label}
+            </NavItem>
           ))}
           <NavIndicator layoutId="nav-indicator" />
         </Nav>
