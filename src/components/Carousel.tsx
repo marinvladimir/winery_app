@@ -6,8 +6,9 @@ import { useLanguage } from "../context/i18n";
 import { LanguageButton } from "../pages/AboutPage";
 
 const Carousel = () => {
-  const { formatMessage } = useIntl()
+  const { formatMessage } = useIntl();
   const [index, setIndex] = useState(0);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const images = [
     { src: "assets/1-1.jpg", text: formatMessage({ id: "carousel.text1" }), extraText: formatMessage({ id: "carousel.text11" }) },
@@ -21,35 +22,57 @@ const Carousel = () => {
 
     return () => clearInterval(interval);
   }, []);
+
   const { switchLanguage } = useLanguage();
 
   return (
     <HeaderContainer>
       <HeaderContent>
         <Logo src="assets/logo.png" />
-                        <div style={{color:'white'}}>
-              <LanguageButton onClick={() => switchLanguage("hr")}>
-                <FormattedMessage id="language.hr" />
-              </LanguageButton> 
-              | 
-              <LanguageButton onClick={() => switchLanguage("en")}>
-                <FormattedMessage id="language.en" />
-              </LanguageButton>
-            </div>
-        <ContactInfo>098 9932 710 &nbsp; | &nbsp; anita_kuzmanic@yahoo.com</ContactInfo>
-        <Nav>
-          {[
-            { label: formatMessage({ id: "welcome.title" }), path: "#/" },
-            { label: formatMessage({ id: "header.link2" }), path: "#/tour" },
-            { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
-            { label: "Kaštel Novi", path: "#/kastel-novi" }
-          ].map((item, i) => (
-            <NavItem key={i} href={item.path}>
-              {item.label}
-            </NavItem>
-          ))}
-          <NavIndicator layoutId="nav-indicator" />
-        </Nav>
+
+        {/* ✅ Mobile Menu Toggle */}
+        <BurgerMenu onClick={() => setIsMenuOpen((prev) => !prev)}>
+          <div className={isMenuOpen ? "open" : ""} />
+          <div className={isMenuOpen ? "open" : ""} />
+          <div className={isMenuOpen ? "open" : ""} />
+        </BurgerMenu>
+
+        {/* ✅ Animated Sliding Nav Menu */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <Nav
+              initial={{ y: -100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -100, opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              {[
+                { label: formatMessage({ id: "welcome.title" }), path: "#/" },
+                { label: formatMessage({ id: "header.link2" }), path: "#/tour" },
+                { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
+                { label: "Kaštel Novi", path: "#/kastel-novi" }
+              ].map((item, i) => (
+                <NavItem key={i} href={item.path} onClick={() => setIsMenuOpen(false)}>
+                  {item.label}
+                </NavItem>
+              ))}
+            </Nav>
+          )}
+        </AnimatePresence>
+
+        {/* ✅ Language & Contact Info */}
+        <HeaderRight>
+          <ContactInfo>098 9932 710 &nbsp; | &nbsp; anita_kuzmanic@yahoo.com</ContactInfo>
+          <LanguageSwitcher>
+            <LanguageButton onClick={() => switchLanguage("hr")}>
+              <FormattedMessage id="language.hr" />
+            </LanguageButton> 
+            | 
+            <LanguageButton onClick={() => switchLanguage("en")}>
+              <FormattedMessage id="language.en" />
+            </LanguageButton>
+          </LanguageSwitcher>
+        </HeaderRight>
       </HeaderContent>
 
       <AnimatePresence>
@@ -71,6 +94,8 @@ const Carousel = () => {
 };
 
 export default Carousel;
+
+/* ========================= STYLES ========================= */
 
 const HeaderContainer = styled.div`
   position: relative;
@@ -101,27 +126,56 @@ const HeaderContent = styled.div`
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(5px);
   z-index: 10;
+
+  @media (max-width: 768px) {
+    justify-content: space-between;
+  }
 `;
 
 const Logo = styled.img`
   max-width: 180px;
 `;
 
-const ContactInfo = styled.div`
-  font-size: 16px;
-  color: #e1e1e1;
+const BurgerMenu = styled.div`
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  gap: 5px;
+
+  div {
+    width: 30px;
+    height: 3px;
+    background: white;
+    transition: 0.3s ease-in-out;
+  }
+
+  @media (max-width: 768px) {
+    display: flex;
+    position: absolute;
+    top: 16px;
+    right: 32px;
+  }
 `;
 
-const Nav = styled.nav`
+const Nav = styled(motion.nav)`
+  position: absolute;
+  top: 204px;
+  left: 0;
+  width: 100%;
+  background: url("assets/wooden.jpg") no-repeat center center;
+  background-size: cover;
   display: flex;
-  gap: 20px;
-  position: relative;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  gap: 15px;
+  z-index: 100;
 `;
 
 const NavItem = styled.a`
   text-decoration: none;
   color: #e1e1e1;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   position: relative;
   padding-bottom: 5px;
@@ -130,31 +184,25 @@ const NavItem = styled.a`
   &:hover {
     color: rgb(233, 218, 158);
   }
+`;
 
-  &:hover::after {
-    width: 100%;
-  }
+const HeaderRight = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 
-  &::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: -3px;
-    width: 0;
-    height: 2px;
-    background: rgb(233, 218, 158);
-    transition: width 0.3s ease, left 0.3s ease;
-    transform: translateX(-50%);
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
-const NavIndicator = styled(motion.div)`
-  position: absolute;
-  bottom: 0;
-  height: 2px;
-  width: 0;
-  background: rgb(233, 218, 158);
-  transition: width 0.3s ease-in-out;
+const ContactInfo = styled.div`
+  font-size: 16px;
+  color: #e1e1e1;
+`;
+
+const LanguageSwitcher = styled.div`
+  color: white;
 `;
 
 const ImageWrapper = styled(motion.div)`
@@ -185,7 +233,6 @@ const TextOverlay = styled.div`
 
   @media (max-width: 768px) {
     font-size: 1.25rem;
-    padding: 0.5rem;
   }
 `;
 
@@ -202,6 +249,5 @@ const TextOverlaySmall = styled.div`
 
   @media (max-width: 768px) {
     font-size: 0.75rem;
-    padding: 0.5rem;
   }
 `;

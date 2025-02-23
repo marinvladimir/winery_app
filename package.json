@@ -25,7 +25,9 @@
     "react-intl": "^7.1.6",
     "react-leaflet": "^4.2.1",
     "react-router-dom": "^7.1.5",
+    "react-slick": "^0.30.3",
     "react-toastify": "^11.0.3",
+    "slick-carousel": "^1.8.1",
     "styled-components": "^6.1.15",
     "three": "^0.172.0"
   },
@@ -33,6 +35,7 @@
     "@eslint/js": "^9.17.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
+    "@types/react-slick": "^0.23.13",
     "@types/react-toastify": "^4.0.2",
     "@types/three": "^0.173.0",
     "@vitejs/plugin-react": "^4.3.4",
