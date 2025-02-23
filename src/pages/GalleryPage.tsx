@@ -140,7 +140,7 @@ const Slide = styled.div`
 
 const Footer = styled.footer`
   background-color: #1b1b1b;
-  padding: 20px;
+  padding: 20px 0;
   width: 100%;
   position: relative;
   margin-top: auto;

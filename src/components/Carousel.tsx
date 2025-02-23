@@ -29,52 +29,36 @@ const Carousel = () => {
     <HeaderContainer>
       <HeaderContent>
         <Logo src="assets/logo.png" />
-
-        {/* ✅ Mobile Menu Toggle */}
         <BurgerMenu onClick={() => setIsMenuOpen((prev) => !prev)}>
           <div className={isMenuOpen ? "open" : ""} />
           <div className={isMenuOpen ? "open" : ""} />
           <div className={isMenuOpen ? "open" : ""} />
         </BurgerMenu>
-
-        {/* ✅ Animated Sliding Nav Menu */}
-        <AnimatePresence>
-          {isMenuOpen && (
-            <Nav
-              initial={{ y: -100, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -100, opacity: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              {[
-                { label: formatMessage({ id: "welcome.title" }), path: "#/" },
-                { label: formatMessage({ id: "header.link2" }), path: "#/tour" },
-                { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
-                { label: "Kaštel Novi", path: "#/kastel-novi" }
-              ].map((item, i) => (
-                <NavItem key={i} href={item.path} onClick={() => setIsMenuOpen(false)}>
-                  {item.label}
-                </NavItem>
-              ))}
-            </Nav>
-          )}
-        </AnimatePresence>
-
-        {/* ✅ Language & Contact Info */}
+        <DesktopNav>
+          {[
+            { label: formatMessage({ id: "welcome.title" }), path: "#/" },
+            { label: formatMessage({ id: "header.link2" }), path: "#/tour" },
+            { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
+            { label: "Kaštel Novi", path: "#/kastel-novi" }
+          ].map((item, i) => (
+            <NavItem key={i} href={item.path}>
+              {item.label}
+            </NavItem>
+          ))}
+        </DesktopNav>
         <HeaderRight>
           <ContactInfo>098 9932 710 &nbsp; | &nbsp; anita_kuzmanic@yahoo.com</ContactInfo>
           <LanguageSwitcher>
             <LanguageButton onClick={() => switchLanguage("hr")}>
               <FormattedMessage id="language.hr" />
-            </LanguageButton> 
-            | 
+            </LanguageButton>
+            |
             <LanguageButton onClick={() => switchLanguage("en")}>
               <FormattedMessage id="language.en" />
             </LanguageButton>
           </LanguageSwitcher>
         </HeaderRight>
       </HeaderContent>
-
       <AnimatePresence>
         <ImageWrapper
           key={images[index].src}
@@ -86,16 +70,59 @@ const Carousel = () => {
           <img src={images[index].src} alt="Winery Image" />
         </ImageWrapper>
       </AnimatePresence>
-
       <TextOverlay>{images[index].text}</TextOverlay>
       <TextOverlaySmall>{images[index].extraText}</TextOverlaySmall>
+      <AnimatePresence>
+        {isMenuOpen && (
+          <MobileNav
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -100, opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {[
+              { label: formatMessage({ id: "welcome.title" }), path: "#/" },
+              { label: formatMessage({ id: "header.link2" }), path: "#/tour" },
+              { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
+              { label: "Kaštel Novi", path: "#/kastel-novi" }
+            ].map((item, i) => (
+              <NavItem key={i} href={item.path} onClick={() => setIsMenuOpen(false)}>
+                {item.label}
+              </NavItem>
+            ))}
+          </MobileNav>
+        )}
+      </AnimatePresence>
     </HeaderContainer>
   );
 };
 
 export default Carousel;
 
-/* ========================= STYLES ========================= */
+const DesktopNav = styled.nav`
+  display: flex;
+  gap: 20px;
+  position: relative;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+const MobileNav = styled(motion.nav)`
+  position: absolute;
+  top: 204px;
+  left: 0;
+  width: 100%;
+  background: url("assets/wooden.jpg") no-repeat center center;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  gap: 15px;
+  z-index: 100;
+`;
 
 const HeaderContainer = styled.div`
   position: relative;
@@ -157,20 +184,20 @@ const BurgerMenu = styled.div`
   }
 `;
 
-const Nav = styled(motion.nav)`
-  position: absolute;
-  top: 204px;
-  left: 0;
-  width: 100%;
-  background: url("assets/wooden.jpg") no-repeat center center;
-  background-size: cover;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 0;
-  gap: 15px;
-  z-index: 100;
-`;
+// const Nav = styled(motion.nav)`
+//   position: absolute;
+//   top: 204px;
+//   left: 0;
+//   width: 100%;
+//   background: url("assets/wooden.jpg") no-repeat center center;
+//   background-size: cover;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   padding: 20px 0;
+//   gap: 15px;
+//   z-index: 100;
+// `;
 
 const NavItem = styled.a`
   text-decoration: none;

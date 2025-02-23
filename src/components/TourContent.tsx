@@ -8,19 +8,19 @@ const TourContent: React.FC = () => {
     return (
         <TourWrapper>
             <Header>{formatMessage({ id: "tour.start" })}</Header>
-            <Separator/>
-            
+            <Separator />
+
             <Section>
                 <h3>{formatMessage({ id: "tour.heading1" })}</h3>
                 <p>{formatMessage({ id: "tour.para1" })}</p>
             </Section>
-            <Separator/>
+            <Separator />
 
             <Section>
                 <h3>{formatMessage({ id: "tour.heading2" })}</h3>
                 <p>{formatMessage({ id: "tour.para2" })}</p>
             </Section>
-            <Separator/>
+            <Separator />
 
             <Section>
                 <h3>{formatMessage({ id: "tour.heading3" })}</h3>
@@ -72,6 +72,9 @@ const TourWrapper = styled.div`
   text-align: center;
   padding: 40px;
   line-height: 1.6;
+  @media (max-width: 768px) {
+    padding: 0;
+  }
 `;
 
 const Section = styled.div`
@@ -106,6 +109,10 @@ const Details = styled.div`
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
   max-width: 600px;
   margin: 0 auto;
+
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
 `;
 
 const DetailsContent = styled.div`
