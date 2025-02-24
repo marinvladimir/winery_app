@@ -9,11 +9,15 @@ import TourPage from "./pages/TourPage";
 import GalleryPage from "./pages/GalleryPage";
 import NoviPage from "./pages/NoviPage";
 
+import Footer from "./components/Footer";
+import Carousel from "./components/Carousel";
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <LanguageProvider>
         <Router>
+          <Carousel />
           <Routes>
             <Route path="/" element={<WelcomePage />} />
             <Route path="/tour" element={<TourPage />} />
@@ -21,6 +25,7 @@ function App() {
             <Route path="/kastel-novi" element={<NoviPage />} />
           </Routes>
         </Router>
+        <Footer /> 
         <ToastContainer position="top-right" autoClose={3000} />
       </LanguageProvider>
     </ThemeProvider>
@@ -28,3 +33,4 @@ function App() {
 }
 
 export default App;
+

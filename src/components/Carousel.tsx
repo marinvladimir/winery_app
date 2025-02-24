@@ -30,16 +30,14 @@ const Carousel = () => {
       <HeaderContent>
         <Logo src="assets/logo.png" />
         <BurgerMenu onClick={() => setIsMenuOpen((prev) => !prev)}>
-          <div className={isMenuOpen ? "open" : ""} />
-          <div className={isMenuOpen ? "open" : ""} />
-          <div className={isMenuOpen ? "open" : ""} />
+        <img src="assets/wn_btn.png" alt="Menu" />
         </BurgerMenu>
         <DesktopNav>
           {[
             { label: formatMessage({ id: "welcome.title" }), path: "#/" },
             { label: formatMessage({ id: "header.link2" }), path: "#/tour" },
             { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
-            { label: "Kaštel Novi", path: "#/kastel-novi" }
+            // { label: "Kaštel Novi", path: "#/kastel-novi" }
           ].map((item, i) => (
             <NavItem key={i} href={item.path}>
               {item.label}
@@ -73,31 +71,58 @@ const Carousel = () => {
       <TextOverlay>{images[index].text}</TextOverlay>
       <TextOverlaySmall>{images[index].extraText}</TextOverlaySmall>
       <AnimatePresence>
-        {isMenuOpen && (
-          <MobileNav
-            initial={{ y: -100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -100, opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {[
-              { label: formatMessage({ id: "welcome.title" }), path: "#/" },
-              { label: formatMessage({ id: "header.link2" }), path: "#/tour" },
-              { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
-              { label: "Kaštel Novi", path: "#/kastel-novi" }
-            ].map((item, i) => (
-              <NavItem key={i} href={item.path} onClick={() => setIsMenuOpen(false)}>
-                {item.label}
-              </NavItem>
-            ))}
-          </MobileNav>
-        )}
-      </AnimatePresence>
+  {isMenuOpen && (
+    <MobileNav
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: -100, opacity: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      {[
+        { label: formatMessage({ id: "welcome.title" }), path: "#/" },
+        { label: formatMessage({ id: "header.link2" }), path: "#/tour" },
+        { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
+        // { label: "Kaštel Novi", path: "#/kastel-novi" }
+      ].map((item, i) => (
+        <NavItem key={i} href={item.path} onClick={() => setIsMenuOpen(false)}>
+          {item.label}
+        </NavItem>
+      ))}
+      <ContactInfoMobile>
+        098 9932 710 &nbsp; | &nbsp; anita_kuzmanic@yahoo.com
+      </ContactInfoMobile>
+      <LanguageSwitcherMobile>
+        <LanguageButton onClick={() => switchLanguage("hr")}>
+          <FormattedMessage id="language.hr" />
+        </LanguageButton>
+        |
+        <LanguageButton onClick={() => switchLanguage("en")}>
+          <FormattedMessage id="language.en" />
+        </LanguageButton>
+      </LanguageSwitcherMobile>
+    </MobileNav>
+  )}
+</AnimatePresence>
+
     </HeaderContainer>
   );
 };
 
 export default Carousel;
+
+const ContactInfoMobile = styled.div`
+  font-size: 16px;
+  color: white;
+  margin-top: 10px;
+  text-align: center;
+`;
+
+const LanguageSwitcherMobile = styled.div`
+  color: white;
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+`;
 
 const DesktopNav = styled.nav`
   display: flex;
@@ -165,22 +190,18 @@ const Logo = styled.img`
 
 const BurgerMenu = styled.div`
   display: none;
-  flex-direction: column;
   cursor: pointer;
-  gap: 5px;
 
-  div {
-    width: 30px;
-    height: 3px;
-    background: white;
-    transition: 0.3s ease-in-out;
+  img {
+    width: 56px;
+    height: auto;
   }
 
   @media (max-width: 768px) {
     display: flex;
     position: absolute;
-    top: 16px;
-    right: 32px;
+    top: 8px;
+    right: 28px;
   }
 `;
 

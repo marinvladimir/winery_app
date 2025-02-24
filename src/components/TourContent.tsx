@@ -1,32 +1,51 @@
 import React from "react";
 import { useIntl } from "react-intl";
+import Slider from "react-slick";
 import styled from "styled-components";
 
 const TourContent: React.FC = () => {
     const { formatMessage } = useIntl();
+    const settings = {
+      dots: false,
+      infinite: true,
+      speed: 600,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      autoplay: true,
+      autoplaySpeed: 4000,
+      arrows: false,
+      adaptiveHeight: false, 
+    };
 
     return (
-        <TourWrapper>
-            <Header>{formatMessage({ id: "tour.start" })}</Header>
-            <Separator />
+      <>
+      <Header>{formatMessage({ id: "tour.start" })}</Header>
+      <SliderContainer>
+                <StyledSlider {...settings}>
+            {Array.from({ length: 9 }, (_, i) => (
+              <Slide key={i}>
+                <img src={`assets/w${i + 1}.jpeg`} alt={`Gallery ${i + 1}`} />
+              </Slide>
+            ))}
+          </StyledSlider>
+          </SliderContainer>
 
+        <TourWrapper>
+            <Separator />
             <Section>
                 <h3>{formatMessage({ id: "tour.heading1" })}</h3>
                 <p>{formatMessage({ id: "tour.para1" })}</p>
             </Section>
             <Separator />
-
             <Section>
                 <h3>{formatMessage({ id: "tour.heading2" })}</h3>
                 <p>{formatMessage({ id: "tour.para2" })}</p>
             </Section>
             <Separator />
-
             <Section>
                 <h3>{formatMessage({ id: "tour.heading3" })}</h3>
                 <p>{formatMessage({ id: "tour.para3" })}</p>
             </Section>
-
             <Details>
                 <DetailsContent>
                     <h3>{formatMessage({ id: "tour.label" })}</h3>
@@ -46,17 +65,132 @@ const TourContent: React.FC = () => {
 
                 <PriceTag>€50</PriceTag>
             </Details>
-
             <ClosingText>{formatMessage({ id: "tour.end" })}</ClosingText>
-        </TourWrapper>
+            <VisitCard>
+                <h2>{formatMessage({ id: "tour.info" })}</h2>
+                <p>Ulica Marina Studina 59, Kaštel Novi</p>
+                <a href="mailto:anita_kuzmanic@yahoo.com">📧 anita_kuzmanic@yahoo.com</a>
+                <p>{formatMessage({ id: "tour.info2" })}</p>
+                <a href="tel:+385989932710">📞 +385 (0)98 993 2710</a>
+                <a href="http://vinaantekuzmanic.com/" target="_blank" rel="noopener noreferrer">
+                    🌍 vinaantekuzmanic.com
+                </a>
+            </VisitCard>
+        </TourWrapper>      </>
     );
 };
 
 export default TourContent;
 
+
+const SliderContainer = styled.div`
+  width: 90%;
+  max-width: 900px;
+  margin: 20px auto;
+`;
+
+const StyledSlider = styled(Slider)`
+  .slick-prev,
+  .slick-next {
+    display: none !important;
+  }
+`;
+
+const Slide = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  height: 500px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    position: relative;
+    z-index: 2; 
+  }
+
+  &:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(20px);
+    opacity: 0.4; 
+    z-index: 1;
+  }
+`;
+
+
+const VisitCard = styled.div`
+  background: url(/assets/paper-texture.jpg) no-repeat center, #f5e8d9;
+  border: 2px solid #5a1f1f;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 400px;
+  margin: 40px auto 0;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+  transform: rotate(-2deg);
+  font-family: "Georgia", serif;
+  margin-bottom: 32px;
+
+  h2 {
+    font-size: 22px;
+    color: #5a1f1f;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
+
+  @media (max-width: 768px) {
+    font-size: 18px !important;
+  }
+  }
+
+  p {
+    font-size: 18px;
+    color: #333;
+    margin: 5px 0;
+
+      @media (max-width: 768px) {
+    font-size: 14px !important;
+  }
+  }
+
+  a {
+    display: block;
+   font-size: 18px;
+    color: #5a1f1f;
+    font-weight: bold;
+    text-decoration: none;
+    margin-top: 5px;
+
+      @media (max-width: 768px) {
+    font-size: 14px !important;
+  }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
+
 const Header = styled.h2`
   background-image: url(/assets/wooden.jpg);
-  color: #bdbdbd;
+  background-size: cover;
+  background-position: center;
+  color: #f5e8d9;
+  margin: 0;
+  margin-top: 16px;
+  padding: 23px;
+  text-align: center;
+  font-family: "Playfair Display", serif;
+  box-shadow: inset 0px -5px 8px rgba(0, 0, 0, 0.3);
 `
 
 const Separator = styled.div`
@@ -70,7 +204,7 @@ const Separator = styled.div`
 const TourWrapper = styled.div`
   max-width: 800px;
   text-align: center;
-  padding: 40px;
+  padding:  0 40px;
   line-height: 1.6;
   @media (max-width: 768px) {
     padding: 0;
@@ -174,3 +308,4 @@ const ClosingText = styled.p`
   font-family: "Georgia", serif;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 `;
+
