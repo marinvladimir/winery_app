@@ -330,9 +330,7 @@ const MyMap: React.FC<{ position: [number, number] }> = ({ position }) => {
   return (
     <MapContainer style={{ height: "250px", width: "100%" }}>
       <SetView center={position} />
-      <TileLayer
-  url="https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png"
-/>
+      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       <Marker position={position}>
         <Popup>Apartman Kuzmanić, Marina Studina 59, 21217 Kaštel Novi</Popup>
       </Marker>
