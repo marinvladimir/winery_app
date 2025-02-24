@@ -9,6 +9,7 @@ const Carousel = () => {
   const { formatMessage } = useIntl();
   const [index, setIndex] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [currentHash, setCurrentHash] = useState(window.location.hash);
 
   const images = [
     { src: "assets/1-1.jpg", text: formatMessage({ id: "carousel.text1" }), extraText: formatMessage({ id: "carousel.text11" }) },
@@ -23,7 +24,24 @@ const Carousel = () => {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const handleHashChange = () => {
+      setCurrentHash(window.location.hash);
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+    
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, []);
+
   const { switchLanguage } = useLanguage();
+  const isActive = (path: string) => currentHash === path;
+
+  const handleNavigation = (path: string) => {
+    window.location.hash = path;
+  };
 
   return (
     <HeaderContainer>
@@ -39,9 +57,9 @@ const Carousel = () => {
             { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
             // { label: "Kaštel Novi", path: "#/kastel-novi" }
           ].map((item, i) => (
-            <NavItem key={i} href={item.path}>
-              {item.label}
-            </NavItem>
+            <NavItem key={i} onClick={() => handleNavigation(item.path)} className={isActive(item.path) ? "active" : ""}>
+            {item.label}
+          </NavItem>
           ))}
         </DesktopNav>
         <HeaderRight>
@@ -84,9 +102,9 @@ const Carousel = () => {
         { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
         // { label: "Kaštel Novi", path: "#/kastel-novi" }
       ].map((item, i) => (
-        <NavItem key={i} href={item.path} onClick={() => setIsMenuOpen(false)}>
-          {item.label}
-        </NavItem>
+        <NavItem key={i} onClick={() => handleNavigation(item.path)} className={isActive(item.path) ? "active" : ""}>
+  {item.label}
+</NavItem>
       ))}
       <ContactInfoMobile>
         098 9932 710 &nbsp; | &nbsp; anita_kuzmanic@yahoo.com
@@ -147,6 +165,10 @@ const MobileNav = styled(motion.nav)`
   padding: 20px 0;
   gap: 15px;
   z-index: 100;
+ @media (min-width: 769px) {
+    display: none;
+  }
+
 `;
 
 const HeaderContainer = styled.div`
@@ -227,12 +249,39 @@ const NavItem = styled.a`
   font-weight: bold;
   position: relative;
   padding-bottom: 5px;
-  transition: all 0.3s ease;
+  transition: color 0.3s ease;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 0%;
+    height: 2px;
+    background-color: rgb(233, 218, 158);
+    transition: width 0.3s ease, left 0.3s ease;
+  }
 
   &:hover {
     color: rgb(233, 218, 158);
+    cursor: pointer !important;
+
+    &::after {
+      width: 100%;
+      left: 0;
+    }
+  }
+
+  &.active {
+    color: rgb(233, 218, 158);
+
+    &::after {
+      width: 100%;
+      left: 0;
+    }
   }
 `;
+
 
 const HeaderRight = styled.div`
   display: flex;

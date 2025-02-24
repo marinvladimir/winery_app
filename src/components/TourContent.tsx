@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useIntl } from "react-intl";
 import Slider from "react-slick";
 import styled from "styled-components";
@@ -14,14 +14,34 @@ const TourContent: React.FC = () => {
       autoplay: true,
       autoplaySpeed: 4000,
       arrows: false,
-      adaptiveHeight: false, 
+      adaptiveHeight: false,
+      beforeChange: () => {
+        document.activeElement instanceof HTMLElement && document.activeElement.blur();
+      },
     };
+    
+
+    const sliderRef = useRef<Slider>(null);
+
+useEffect(() => {
+  const handleSlideChange = () => {
+    const slides = document.querySelectorAll(".slick-slide[aria-hidden='true']");
+    slides.forEach(slide => {
+      slide.querySelectorAll("a, button, input, select, textarea").forEach(el => el.setAttribute("tabindex", "-1"));
+    });
+  };
+
+  handleSlideChange();
+  sliderRef.current?.slickGoTo(0);
+  return () => window.removeEventListener("load", handleSlideChange);
+}, []);
+
 
     return (
       <>
       <Header>{formatMessage({ id: "tour.start" })}</Header>
       <SliderContainer>
-                <StyledSlider {...settings}>
+      <StyledSlider ref={sliderRef} {...settings}>
             {Array.from({ length: 9 }, (_, i) => (
               <Slide key={i}>
                 <img src={`assets/w${i + 1}.jpeg`} alt={`Gallery ${i + 1}`} />
@@ -96,36 +116,25 @@ const StyledSlider = styled(Slider)`
   }
 `;
 
-const Slide = styled.div`
+const Slide = styled.div<{ isActive: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
   width: 100%;
   height: 500px;
+  pointer-events: ${({ isActive }) => (isActive ? "auto" : "none")};
+  tabindex: ${({ isActive }) => (isActive ? "0" : "-1")};
 
   img {
     width: 100%;
     height: 100%;
-    object-fit: cover; 
+    object-fit: cover;
     position: relative;
-    z-index: 2; 
-  }
-
-  &:before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    filter: blur(20px);
-    opacity: 0.4; 
-    z-index: 1;
+    z-index: 2;
   }
 `;
+
 
 
 const VisitCard = styled.div`
