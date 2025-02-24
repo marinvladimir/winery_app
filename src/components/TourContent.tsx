@@ -4,100 +4,124 @@ import Slider from "react-slick";
 import styled from "styled-components";
 
 const TourContent: React.FC = () => {
-    const { formatMessage } = useIntl();
-    const settings = {
-      dots: false,
-      infinite: true,
-      speed: 600,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      autoplay: true,
-      autoplaySpeed: 4000,
-      arrows: false,
-      adaptiveHeight: false,
-      beforeChange: () => {
-        document.activeElement instanceof HTMLElement && document.activeElement.blur();
-      },
-    };
-    
-
-    const sliderRef = useRef<Slider>(null);
-
-useEffect(() => {
-  const handleSlideChange = () => {
-    const slides = document.querySelectorAll(".slick-slide[aria-hidden='true']");
-    slides.forEach(slide => {
-      slide.querySelectorAll("a, button, input, select, textarea").forEach(el => el.setAttribute("tabindex", "-1"));
-    });
+  const { formatMessage } = useIntl();
+  const settings = {
+    dots: false,
+    infinite: true,
+    speed: 600,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 4000,
+    arrows: false,
+    adaptiveHeight: false,
+    beforeChange: () => {
+      document.activeElement instanceof HTMLElement && document.activeElement.blur();
+    },
   };
 
-  handleSlideChange();
-  sliderRef.current?.slickGoTo(0);
-  return () => window.removeEventListener("load", handleSlideChange);
-}, []);
 
+  const sliderRef = useRef<Slider>(null);
 
-    return (
-      <>
+  useEffect(() => {
+    const handleSlideChange = () => {
+      const slides = document.querySelectorAll(".slick-slide[aria-hidden='true']");
+      slides.forEach(slide => {
+        slide.querySelectorAll("a, button, input, select, textarea").forEach(el => el.setAttribute("tabindex", "-1"));
+      });
+    };
+
+    handleSlideChange();
+    sliderRef.current?.slickGoTo(0);
+    return () => window.removeEventListener("load", handleSlideChange);
+  }, []);
+
+  useEffect(() => {
+    const updateSlidesAccessibility = () => {
+      const allSlides = document.querySelectorAll(".slick-slide");
+
+      allSlides.forEach(slide => {
+        const isHidden = slide.getAttribute("aria-hidden") === "true";
+
+        if (isHidden) {
+          slide.setAttribute("inert", "");
+          slide.querySelectorAll("a, button, input, select, textarea").forEach(el => el.setAttribute("tabindex", "-1"));
+        } else {
+          slide.removeAttribute("inert");
+          slide.querySelectorAll("a, button, input, select, textarea").forEach(el => el.removeAttribute("tabindex"));
+        }
+      });
+    };
+
+    const observer = new MutationObserver(updateSlidesAccessibility);
+    observer.observe(document.body, { subtree: true, attributes: true, attributeFilter: ["aria-hidden"] });
+
+    updateSlidesAccessibility();
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <>
       <Header>{formatMessage({ id: "tour.start" })}</Header>
       <SliderContainer>
-      <StyledSlider ref={sliderRef} {...settings}>
-              {Array.from({ length: 9 }, (_, i) => (
-          <Slide key={i} isActive={i === 0}>
-            <img src={`assets/w${i + 1}.jpeg`} alt={`Gallery ${i + 1}`} />
-          </Slide>
-        ))}
-          </StyledSlider>
-          </SliderContainer>
+        <StyledSlider ref={sliderRef} {...settings}>
+          {Array.from({ length: 9 }, (_, i) => (
+            <Slide key={i} $isActive={i === 0}>
+              <img src={`assets/w${i + 1}.jpeg`} alt={`Gallery ${i + 1}`} />
+            </Slide>
+          ))}
+        </StyledSlider>
+      </SliderContainer>
 
-        <TourWrapper>
-            <Separator />
-            <Section>
-                <h3>{formatMessage({ id: "tour.heading1" })}</h3>
-                <p>{formatMessage({ id: "tour.para1" })}</p>
-            </Section>
-            <Separator />
-            <Section>
-                <h3>{formatMessage({ id: "tour.heading2" })}</h3>
-                <p>{formatMessage({ id: "tour.para2" })}</p>
-            </Section>
-            <Separator />
-            <Section>
-                <h3>{formatMessage({ id: "tour.heading3" })}</h3>
-                <p>{formatMessage({ id: "tour.para3" })}</p>
-            </Section>
-            <Details>
-                <DetailsContent>
-                    <h3>{formatMessage({ id: "tour.label" })}</h3>
-                    <p>
-                        <strong>{formatMessage({ id: "tour.details1" })}</strong> {formatMessage({ id: "tour.details2" })}
-                    </p>
-                    <p>
-                        <strong>{formatMessage({ id: "tour.details3" })}</strong>{formatMessage({ id: "tour.details4" })}
-                    </p>
-                    <p>
-                        <strong>{formatMessage({ id: "tour.details11" })}</strong>{formatMessage({ id: "tour.details12" })}
-                    </p>
-                    <p>
-                        <strong>{formatMessage({ id: "tour.details13" })}</strong>{formatMessage({ id: "tour.details14" })}
-                    </p>
-                </DetailsContent>
+      <TourWrapper>
+        <Separator />
+        <Section>
+          <h3>{formatMessage({ id: "tour.heading1" })}</h3>
+          <p>{formatMessage({ id: "tour.para1" })}</p>
+        </Section>
+        <Separator />
+        <Section>
+          <h3>{formatMessage({ id: "tour.heading2" })}</h3>
+          <p>{formatMessage({ id: "tour.para2" })}</p>
+        </Section>
+        <Separator />
+        <Section>
+          <h3>{formatMessage({ id: "tour.heading3" })}</h3>
+          <p>{formatMessage({ id: "tour.para3" })}</p>
+        </Section>
+        <Details>
+          <DetailsContent>
+            <h3>{formatMessage({ id: "tour.label" })}</h3>
+            <p>
+              <strong>{formatMessage({ id: "tour.details1" })}</strong> {formatMessage({ id: "tour.details2" })}
+            </p>
+            <p>
+              <strong>{formatMessage({ id: "tour.details3" })}</strong>{formatMessage({ id: "tour.details4" })}
+            </p>
+            <p>
+              <strong>{formatMessage({ id: "tour.details11" })}</strong>{formatMessage({ id: "tour.details12" })}
+            </p>
+            <p>
+              <strong>{formatMessage({ id: "tour.details13" })}</strong>{formatMessage({ id: "tour.details14" })}
+            </p>
+          </DetailsContent>
 
-                <PriceTag>€50</PriceTag>
-            </Details>
-            <ClosingText>{formatMessage({ id: "tour.end" })}</ClosingText>
-            <VisitCard>
-                <h2>{formatMessage({ id: "tour.info" })}</h2>
-                <p>Ulica Marina Studina 59, Kaštel Novi</p>
-                <a href="mailto:anita_kuzmanic@yahoo.com">📧 anita_kuzmanic@yahoo.com</a>
-                <p>{formatMessage({ id: "tour.info2" })}</p>
-                <a href="tel:+385989932710">📞 +385 (0)98 993 2710</a>
-                <a href="http://vinaantekuzmanic.com/" target="_blank" rel="noopener noreferrer">
-                    🌍 vinaantekuzmanic.com
-                </a>
-            </VisitCard>
-        </TourWrapper>      </>
-    );
+          <PriceTag>€50</PriceTag>
+        </Details>
+        <ClosingText>{formatMessage({ id: "tour.end" })}</ClosingText>
+        <VisitCard>
+          <h2>{formatMessage({ id: "tour.info" })}</h2>
+          <p>Ulica Marina Studina 59, Kaštel Novi</p>
+          <a href="mailto:anita_kuzmanic@yahoo.com">📧 anita_kuzmanic@yahoo.com</a>
+          <p>{formatMessage({ id: "tour.info2" })}</p>
+          <a href="tel:+385989932710">📞 +385 (0)98 993 2710</a>
+          <a href="http://vinaantekuzmanic.com/" target="_blank" rel="noopener noreferrer">
+            🌍 vinaantekuzmanic.com
+          </a>
+        </VisitCard>
+      </TourWrapper>      </>
+  );
 };
 
 export default TourContent;
@@ -116,15 +140,16 @@ const StyledSlider = styled(Slider)`
   }
 `;
 
-const Slide = styled.div<{ isActive: boolean }>`
+const Slide = styled.div<{ $isActive: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
   width: 100%;
   height: 500px;
-  pointer-events: ${({ isActive }) => (isActive ? "auto" : "none")};
-  tabindex: ${({ isActive }) => (isActive ? "0" : "-1")};
+  pointer-events: ${({ $isActive }) => ($isActive ? "auto" : "none")};
+  tabindex: ${({ $isActive }) => ($isActive ? "0" : "-1")};
+    ${({ $isActive }) => !$isActive && "inert: true;"}
 
   img {
     width: 100%;
@@ -134,6 +159,7 @@ const Slide = styled.div<{ isActive: boolean }>`
     z-index: 2;
   }
 `;
+
 
 const VisitCard = styled.div`
   background: url(/assets/paper-texture.jpg) no-repeat center, #f5e8d9;
