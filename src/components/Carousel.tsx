@@ -63,17 +63,23 @@ const Carousel = () => {
           ))}
         </DesktopNav>
         <HeaderRight>
-          <ContactInfo>098 9932 710 &nbsp; | &nbsp; anita_kuzmanic@yahoo.com</ContactInfo>
-          <LanguageSwitcher>
-            <LanguageButton onClick={() => switchLanguage("hr")}>
-              <FormattedMessage id="language.hr" />
-            </LanguageButton>
-            |
-            <LanguageButton onClick={() => switchLanguage("en")}>
-              <FormattedMessage id="language.en" />
-            </LanguageButton>
-          </LanguageSwitcher>
-        </HeaderRight>
+  <ContactInfo>
+    098 9932 710
+  </ContactInfo>
+  <ContactEmail href="mailto:anita_kuzmanic@yahoo.com">
+    anita_kuzmanic@yahoo.com
+  </ContactEmail>
+  <LanguageSwitcher>
+    <LanguageButton onClick={() => switchLanguage("hr")}>
+      <FormattedMessage id="language.hr" />
+    </LanguageButton>
+    |
+    <LanguageButton onClick={() => switchLanguage("en")}>
+      <FormattedMessage id="language.en" />
+    </LanguageButton>
+  </LanguageSwitcher>
+</HeaderRight>
+
       </HeaderContent>
       <AnimatePresence>
         <ImageWrapper
@@ -91,34 +97,42 @@ const Carousel = () => {
       <AnimatePresence>
   {isMenuOpen && (
     <MobileNav
-      initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      exit={{ y: -100, opacity: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      {[
-        { label: formatMessage({ id: "welcome.title" }), path: "#/" },
-        { label: formatMessage({ id: "header.link2" }), path: "#/tour" },
-        { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
-        // { label: "Kaštel Novi", path: "#/kastel-novi" }
-      ].map((item, i) => (
-        <NavItem key={i} onClick={() => handleNavigation(item.path)} className={isActive(item.path) ? "active" : ""}>
-  {item.label}
-</NavItem>
-      ))}
-      <ContactInfoMobile>
-        098 9932 710 &nbsp; | &nbsp; anita_kuzmanic@yahoo.com
-      </ContactInfoMobile>
-      <LanguageSwitcherMobile>
-        <LanguageButton onClick={() => switchLanguage("hr")}>
-          <FormattedMessage id="language.hr" />
-        </LanguageButton>
-        |
-        <LanguageButton onClick={() => switchLanguage("en")}>
-          <FormattedMessage id="language.en" />
-        </LanguageButton>
-      </LanguageSwitcherMobile>
-    </MobileNav>
+  initial={{ y: -100, opacity: 0 }}
+  animate={{ y: 0, opacity: 1 }}
+  exit={{ y: -100, opacity: 0 }}
+  transition={{ duration: 0.5 }}
+>
+  <button onClick={()=> setIsMenuOpen(false)} style={{ position: "absolute", top: 10, right: 15, background: "none", border: "none", fontSize: "20px", color: "white", cursor: "pointer" }}>
+    ✖
+  </button>
+
+  {[
+    { label: formatMessage({ id: "welcome.title" }), path: "#/" },
+    { label: formatMessage({ id: "header.link2" }), path: "#/tour" },
+    { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
+  ].map((item, i) => (
+    <NavItem key={i} onClick={() => { handleNavigation(item.path); ()=> setIsMenuOpen(false); }} className={isActive(item.path) ? "active" : ""}>
+      {item.label}
+    </NavItem>
+  ))}
+
+<ContactInfo>
+    098 9932 710
+  </ContactInfo>
+  <ContactEmail href="mailto:anita_kuzmanic@yahoo.com">
+    anita_kuzmanic@yahoo.com
+  </ContactEmail>
+  <LanguageSwitcher>
+    <LanguageButton onClick={() => switchLanguage("hr")}>
+      <FormattedMessage id="language.hr" />
+    </LanguageButton>
+    |
+    <LanguageButton onClick={() => switchLanguage("en")}>
+      <FormattedMessage id="language.en" />
+    </LanguageButton>
+  </LanguageSwitcher>
+</MobileNav>
+
   )}
 </AnimatePresence>
 
@@ -128,19 +142,26 @@ const Carousel = () => {
 
 export default Carousel;
 
-const ContactInfoMobile = styled.div`
-  font-size: 16px;
-  color: white;
-  margin-top: 10px;
-  text-align: center;
-`;
+// const ContactInfoMobile = styled.div`
+//   font-size: 16px;
+//   color: white;
+//   margin-top: 20px; 
+//   text-align: center;
+//   padding: 10px;
+//   border-top: 1px solid rgba(255, 255, 255, 0.3);
+//   width: 100%;
+// `;
 
-const LanguageSwitcherMobile = styled.div`
-  color: white;
-  margin-top: 10px;
-  display: flex;
-  gap: 10px;
-`;
+
+// const LanguageSwitcherMobile = styled.div`
+//   color: white;
+//   margin-top: 15px;
+//   display: flex;
+//   gap: 15px; 
+//   justify-content: center;
+//   align-items: center;
+//   padding: 10px;
+// `;
 
 const DesktopNav = styled.nav`
   display: flex;
@@ -153,22 +174,24 @@ const DesktopNav = styled.nav`
 `;
 
 const MobileNav = styled(motion.nav)`
-  position: absolute;
+  position: fixed;
   top: 204px;
   left: 0;
   width: 100%;
-  background: url("assets/wooden.jpg") no-repeat center center;
+  // height: 100vh;
+ background: url("assets/wooden.jpg") no-repeat center center;
   background-size: cover;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center; /* Center items */
   padding: 20px 0;
-  gap: 15px;
-  z-index: 100;
- @media (min-width: 769px) {
+  gap: 20px; /* More spacing */
+  z-index: 1000;
+  
+  @media (min-width: 769px) {
     display: none;
   }
-
 `;
 
 const HeaderContainer = styled.div`
@@ -287,6 +310,7 @@ const HeaderRight = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  gap: 8px;
 
   @media (max-width: 768px) {
     display: none;
@@ -294,13 +318,73 @@ const HeaderRight = styled.div`
 `;
 
 const ContactInfo = styled.div`
-  font-size: 16px;
+  font-size: 18px;
+  font-weight: 500;
   color: #e1e1e1;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+
+  &::before {
+    content: "📞";
+    font-size: 20px;
+    color: #ffcc66;
+  }
+
+  &:hover {
+    color: #ffcc66;
+    text-shadow: 1px 1px 12px rgba(255, 204, 102, 0.8);
+  }
+`;
+
+const ContactEmail = styled.a`
+  font-size: 18px;
+  font-weight: 500;
+  color: #e1e1e1;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &::before {
+    content: "✉️";
+    font-size: 20px;
+    color: #ffcc66;
+  }
+
+  &:hover {
+    color: #ffcc66;
+    text-shadow: 1px 1px 12px rgba(255, 204, 102, 0.8);
+  }
 `;
 
 const LanguageSwitcher = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
   color: white;
+  font-size: 16px;
+  font-weight: 500;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  & > button {
+    background: transparent;
+    border: none;
+    color: #e1e1e1;
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #ffcc66;
+    }
+  }
 `;
+
 
 const ImageWrapper = styled(motion.div)`
   position: absolute;

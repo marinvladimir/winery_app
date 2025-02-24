@@ -61,7 +61,7 @@ const FooterContent = styled.div`
   }
 `;
 
-const FooterText = styled.p`
+const FooterText = styled.div`
   margin: 10px 0;
   line-height: 1.5rem;
   color: #979797;

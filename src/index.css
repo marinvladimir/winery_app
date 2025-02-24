@@ -20,6 +20,7 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  /* font-family: "Playfair Display", serif; */
 }
 
 h1 {
@@ -33,6 +34,7 @@ h2{
 }
 
 p{
-  font-family: 'Assistant', sans-serif;
+  /* font-family: 'Assistant', sans-serif; */
+  font-family: "Cormorant Garamond", serif;
   color: #5c5c5c;
 }

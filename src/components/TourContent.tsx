@@ -129,7 +129,7 @@ export default TourContent;
 
 const SliderContainer = styled.div`
   width: 90%;
-  max-width: 900px;
+  max-width: 800px;
   margin: 20px auto;
 `;
 
