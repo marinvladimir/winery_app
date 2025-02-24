@@ -2,6 +2,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import styled from "styled-components";
 import AboutSection from "../components/AboutSection";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import L from "leaflet";
 import { useIntl, FormattedMessage } from "react-intl";
 // import { useLanguage } from "../context/i18n";
 import "leaflet/dist/leaflet.css";
@@ -13,6 +14,15 @@ import {
 } from "../config";
 import { toast } from "react-toastify";
 import { getVisitorCount, incrementVisitorCount } from "../utils/redisClient";
+
+const customIcon = new L.Icon({
+  iconUrl: "/leaflet/marker.webp",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  // shadowUrl: "/leaflet/images/marker-shadow.png",
+  shadowSize: [41, 41],
+});
 
 const Container = styled.section`
   width: 90%;
@@ -257,8 +267,8 @@ const AboutPage = () => {
       <ContentWrapper>
         <AboutSection />
         <RightSection>
-        {/* <ContactInfo> */}
-            {/* <div>
+          {/* <ContactInfo> */}
+          {/* <div>
               <LanguageButton onClick={() => switchLanguage("hr")}>
                 <FormattedMessage id="language.hr" />
               </LanguageButton> 
@@ -284,28 +294,28 @@ const AboutPage = () => {
             </div>
           </ContactInfo>
           <ContactForm onSubmit={handleSubmit}>
-  <h3 style={{ marginTop: 0 }}>{formatMessage({ id: "contact.title" })}</h3>
+            <h3 style={{ marginTop: 0 }}>{formatMessage({ id: "contact.title" })}</h3>
 
-  <label>{formatMessage({ id: "contact.name" })}</label>
-  <input type="text" name="name" value={formData.name} onChange={handleChange} />
-  {errors.name && <span className="error" style={{color: "#c33737"}}>{errors.name}</span>}
+            <label>{formatMessage({ id: "contact.name" })}</label>
+            <input type="text" name="name" value={formData.name} onChange={handleChange} />
+            {errors.name && <span className="error" style={{ color: "#c33737" }}>{errors.name}</span>}
 
-  <label>{formatMessage({ id: "contact.email" })}</label>
-  <input type="email" name="email" value={formData.email} onChange={handleChange} />
-  {errors.email && <span className="error" style={{color: "#c33737"}}>{errors.email}</span>}
+            <label>{formatMessage({ id: "contact.email" })}</label>
+            <input type="email" name="email" value={formData.email} onChange={handleChange} />
+            {errors.email && <span className="error" style={{ color: "#c33737" }}>{errors.email}</span>}
 
-  <label>{formatMessage({ id: "contact.verification" })}</label>
-  <input type="text" name="verification" value={formData.verification} onChange={handleChange} />
-  {errors.verification && <span className="error" style={{color: "#c33737"}}>{errors.verification}</span>}
+            <label>{formatMessage({ id: "contact.verification" })}</label>
+            <input type="text" name="verification" value={formData.verification} onChange={handleChange} />
+            {errors.verification && <span className="error" style={{ color: "#c33737" }}>{errors.verification}</span>}
 
-  <label>{formatMessage({ id: "contact.message" })}</label>
-  <textarea name="message" rows={4} value={formData.message} onChange={handleChange}></textarea>
-  {errors.message && <span className="error" style={{color: "#c33737"}}>{errors.message}</span>}
+            <label>{formatMessage({ id: "contact.message" })}</label>
+            <textarea name="message" rows={4} value={formData.message} onChange={handleChange}></textarea>
+            {errors.message && <span className="error" style={{ color: "#c33737" }}>{errors.message}</span>}
 
-  <SubmitButton type="submit" $isDisabled={loading} disabled={loading}>
-    {loading ? formatMessage({ id: "contact.sending" }) : formatMessage({ id: "contact.send" })}
-  </SubmitButton>
-</ContactForm>
+            <SubmitButton type="submit" $isDisabled={loading} disabled={loading}>
+              {loading ? formatMessage({ id: "contact.sending" }) : formatMessage({ id: "contact.send" })}
+            </SubmitButton>
+          </ContactForm>
           <MyMap position={position} />
           <VisitorCounter>
             <FormattedMessage id="visitor.count" /> {visitorCount}
@@ -331,7 +341,7 @@ const MyMap: React.FC<{ position: [number, number] }> = ({ position }) => {
     <MapContainer style={{ height: "250px", width: "100%" }}>
       <SetView center={position} />
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      <Marker position={position}>
+      <Marker position={position} icon={customIcon}>
         <Popup>Apartman Kuzmanić, Marina Studina 59, 21217 Kaštel Novi</Popup>
       </Marker>
     </MapContainer>
