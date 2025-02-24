@@ -16,9 +16,9 @@ import { toast } from "react-toastify";
 import { getVisitorCount, incrementVisitorCount } from "../utils/redisClient";
 
 const customIcon = new L.Icon({
-  iconUrl: "/leaflet/marker.webp",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
+  iconUrl: "/leaflet/marker.png",
+  iconSize: [41, 41],
+  iconAnchor: [21, 41],
   popupAnchor: [1, -34],
   // shadowUrl: "/leaflet/images/marker-shadow.png",
   shadowSize: [41, 41],
