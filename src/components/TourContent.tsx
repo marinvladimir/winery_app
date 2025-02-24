@@ -42,11 +42,11 @@ useEffect(() => {
       <Header>{formatMessage({ id: "tour.start" })}</Header>
       <SliderContainer>
       <StyledSlider ref={sliderRef} {...settings}>
-            {Array.from({ length: 9 }, (_, i) => (
-              <Slide key={i}>
-                <img src={`assets/w${i + 1}.jpeg`} alt={`Gallery ${i + 1}`} />
-              </Slide>
-            ))}
+              {Array.from({ length: 9 }, (_, i) => (
+          <Slide key={i} isActive={i === 0}>
+            <img src={`assets/w${i + 1}.jpeg`} alt={`Gallery ${i + 1}`} />
+          </Slide>
+        ))}
           </StyledSlider>
           </SliderContainer>
 
@@ -134,8 +134,6 @@ const Slide = styled.div<{ isActive: boolean }>`
     z-index: 2;
   }
 `;
-
-
 
 const VisitCard = styled.div`
   background: url(/assets/paper-texture.jpg) no-repeat center, #f5e8d9;
