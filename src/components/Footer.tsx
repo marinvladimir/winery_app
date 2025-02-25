@@ -21,7 +21,7 @@ const Footer: React.FC = () => {
                         <br />
                         098 9932 710
                         <br />
-                        anita_kuzmanic@yahoo.com
+                        vinarija.kuzmanic@gmail.com
                     </FooterText>
                     <Separator />
                     <FooterText>{formatMessage({ id: "footer.text" })}</FooterText>

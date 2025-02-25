@@ -67,8 +67,8 @@ const Carousel = () => {
   <ContactInfo>
     098 9932 710
   </ContactInfo>
-  <ContactEmail href="mailto:anita_kuzmanic@yahoo.com">
-    anita_kuzmanic@yahoo.com
+  <ContactEmail href="mailto:vinarija.kuzmanic@gmail.com">
+  vinarija.kuzmanic@gmail.com
   </ContactEmail>
   <LanguageSwitcher>
     <LanguageButton onClick={() => switchLanguage("hr")}>
@@ -120,8 +120,8 @@ const Carousel = () => {
 <ContactInfo>
     098 9932 710
   </ContactInfo>
-  <ContactEmail href="mailto:anita_kuzmanic@yahoo.com">
-    anita_kuzmanic@yahoo.com
+  <ContactEmail href="mailto:vinarija.kuzmanic@gmail.com">
+  vinarija.kuzmanic@gmail.com
   </ContactEmail>
   <LanguageSwitcher>
     <LanguageButton onClick={() => switchLanguage("hr")}>

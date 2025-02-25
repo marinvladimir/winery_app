@@ -113,7 +113,7 @@ const TourContent: React.FC = () => {
         <VisitCard>
           <h2>{formatMessage({ id: "tour.info" })}</h2>
           <p>Ulica Marina Studina 59, Kaštel Novi</p>
-          <a href="mailto:anita_kuzmanic@yahoo.com">📧 anita_kuzmanic@yahoo.com</a>
+          <a href="mailto:vinarija.kuzmanic@gmail.com">📧 vinarija.kuzmanic@gmail.com</a>
           <p>{formatMessage({ id: "tour.info2" })}</p>
           <a href="tel:+385989932710">📞 +385 (0)98 993 2710</a>
           <a href="http://vinaantekuzmanic.com/" target="_blank" rel="noopener noreferrer">

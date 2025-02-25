@@ -288,7 +288,7 @@ const AboutPage = () => {
               <div style={{ marginTop: "2rem" }}>
                 <p><strong>Anita Kuzmanić</strong></p>
                 <p>098 9932 710</p>
-                <p>anita_kuzmanic@yahoo.com
+                <p>vinarija.kuzmanic@gmail.com
                 </p>
               </div>
             </div>

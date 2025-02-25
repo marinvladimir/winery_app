@@ -3,8 +3,6 @@ import styled from "styled-components";
 
 const GalleryPage: React.FC = () => {
 
-
-
   return (
     <PageWrapper>
       <ContentWrapper>
@@ -28,6 +26,5 @@ const ContentWrapper = styled.main`
 const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
   text-align: center;
 `;
