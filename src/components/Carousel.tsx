@@ -41,6 +41,7 @@ const Carousel = () => {
 
   const handleNavigation = (path: string) => {
     window.location.hash = path;
+    setIsMenuOpen(false)
   };
 
   return (
