@@ -170,7 +170,7 @@ const AboutSection = () => {
       <ImageGallery>
         {[
           { name: "Crljenak", src: "assets/1.jpg" },
-          { name: "Fabljan bijeli", src: "assets/2 (1).jpg" },
+          { name: "Trbljan bijeli", src: "assets/2 (1).jpg" },
           { name: "Babica", src: "assets/3.jpg" },
           { name: "Plavac mali", src: "assets/4.jpg" },
         ].map((wine, index) => (
