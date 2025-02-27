@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import styled from "styled-components";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useLanguage } from "../context/i18n";
@@ -7,22 +7,8 @@ import { LanguageButton } from "./MotionBg";
 
 const Carousel = () => {
   const { formatMessage } = useIntl();
-  const [index, setIndex] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentHash, setCurrentHash] = useState(window.location.hash);
-
-  // const images = [
-  //   { src: "assets/1-1.jpg", text: formatMessage({ id: "carousel.text1" }), extraText: formatMessage({ id: "carousel.text11" }) },
-  //   { src: "assets/2.jpg", text: formatMessage({ id: "carousel.text2" }) }
-  // ];
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setIndex((prevIndex) => (prevIndex + 1) % images.length);
-  //   }, 5000);
-
-  //   return () => clearInterval(interval);
-  // }, []);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -30,7 +16,7 @@ const Carousel = () => {
     };
 
     window.addEventListener("hashchange", handleHashChange);
-    
+
     return () => {
       window.removeEventListener("hashchange", handleHashChange);
     };
@@ -49,120 +35,80 @@ const Carousel = () => {
       <HeaderContent>
         <Logo src="assets/logo.png" />
         <BurgerMenu onClick={() => setIsMenuOpen((prev) => !prev)}>
-        <img src="assets/wn_btn.png" alt="Menu" />
+          <img src="assets/wn_btn.png" alt="Menu" />
         </BurgerMenu>
         <DesktopNav>
           {[
             { label: formatMessage({ id: "welcome.title" }), path: "#/" },
             { label: formatMessage({ id: "header.link2" }), path: "#/tour" },
-            { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
-            // { label: "Kaštel Novi", path: "#/kastel-novi" }
+            { label: formatMessage({ id: "header.link3" }), path: "#/gallery" }
           ].map((item, i) => (
             <NavItem key={i} onClick={() => handleNavigation(item.path)} className={isActive(item.path) ? "active" : ""}>
-            {item.label}
-          </NavItem>
+              {item.label}
+            </NavItem>
           ))}
         </DesktopNav>
         <HeaderRight>
-  <ContactInfo>
-    098 9932 710
-  </ContactInfo>
-  <ContactEmail href="mailto:vinarija.kuzmanic@gmail.com">
-  vinarija.kuzmanic@gmail.com
-  </ContactEmail>
-  <LanguageSwitcher>
-    <LanguageButton onClick={() => switchLanguage("hr")}>
-      <FormattedMessage id="language.hr" />
-    </LanguageButton>
-    |
-    <LanguageButton onClick={() => switchLanguage("en")}>
-      <FormattedMessage id="language.en" />
-    </LanguageButton>
-  </LanguageSwitcher>
-</HeaderRight>
-
+          <ContactInfo>
+            098 9932 710
+          </ContactInfo>
+          <ContactEmail href="mailto:vinarija.kuzmanic@gmail.com">
+            vinarija.kuzmanic@gmail.com
+          </ContactEmail>
+          <LanguageSwitcher>
+            <LanguageButton onClick={() => switchLanguage("hr")}>
+              <FormattedMessage id="language.hr" />
+            </LanguageButton>
+            |
+            <LanguageButton onClick={() => switchLanguage("en")}>
+              <FormattedMessage id="language.en" />
+            </LanguageButton>
+          </LanguageSwitcher>
+        </HeaderRight>
       </HeaderContent>
-      {/* <AnimatePresence>
-        <ImageWrapper
-          key={images[index].src}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1 }}
+      {isMenuOpen && (
+        <MobileNav
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -100, opacity: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          <img src={images[index].src} alt="Winery Image" />
-        </ImageWrapper>
-      </AnimatePresence> */}
-      {/* <TextOverlay>{images[index].text}</TextOverlay>
-      <TextOverlaySmall>{images[index].extraText}</TextOverlaySmall> */}
-      {/* <AnimatePresence> */}
-  {isMenuOpen && (
-    <MobileNav
-  initial={{ y: -100, opacity: 0 }}
-  animate={{ y: 0, opacity: 1 }}
-  exit={{ y: -100, opacity: 0 }}
-  transition={{ duration: 0.5 }}
->
-  <button onClick={()=> setIsMenuOpen(false)} style={{ position: "absolute", top: 10, right: 15, background: "none", border: "none", fontSize: "20px", color: "white", cursor: "pointer" }}>
-    ✖
-  </button>
+          <button onClick={() => setIsMenuOpen(false)} style={{ position: "absolute", top: 10, right: 15, background: "none", border: "none", fontSize: "20px", color: "white", cursor: "pointer" }}>
+            ✖
+          </button>
 
-  {[
-    { label: formatMessage({ id: "welcome.title" }), path: "#/" },
-    { label: formatMessage({ id: "header.link2" }), path: "#/tour" },
-    { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
-  ].map((item, i) => (
-    <NavItem key={i} onClick={() => { handleNavigation(item.path); ()=> setIsMenuOpen(false); }} className={isActive(item.path) ? "active" : ""}>
-      {item.label}
-    </NavItem>
-  ))}
+          {[
+            { label: formatMessage({ id: "welcome.title" }), path: "#/" },
+            { label: formatMessage({ id: "header.link2" }), path: "#/tour" },
+            { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
+          ].map((item, i) => (
+            <NavItem key={i} onClick={() => { handleNavigation(item.path); () => setIsMenuOpen(false); }} className={isActive(item.path) ? "active" : ""}>
+              {item.label}
+            </NavItem>
+          ))}
 
-<ContactInfo>
-    098 9932 710
-  </ContactInfo>
-  <ContactEmail href="mailto:vinarija.kuzmanic@gmail.com">
-  vinarija.kuzmanic@gmail.com
-  </ContactEmail>
-  <LanguageSwitcher>
-    <LanguageButton onClick={() => switchLanguage("hr")}>
-      <FormattedMessage id="language.hr" />
-    </LanguageButton>
-    |
-    <LanguageButton onClick={() => switchLanguage("en")}>
-      <FormattedMessage id="language.en" />
-    </LanguageButton>
-  </LanguageSwitcher>
-</MobileNav>
-
-  )}
-{/* </AnimatePresence> */}
-
+          <ContactInfo>
+            098 9932 710
+          </ContactInfo>
+          <ContactEmail href="mailto:vinarija.kuzmanic@gmail.com">
+            vinarija.kuzmanic@gmail.com
+          </ContactEmail>
+          <LanguageSwitcher>
+            <LanguageButton onClick={() => switchLanguage("hr")}>
+              <FormattedMessage id="language.hr" />
+            </LanguageButton>
+            |
+            <LanguageButton onClick={() => switchLanguage("en")}>
+              <FormattedMessage id="language.en" />
+            </LanguageButton>
+          </LanguageSwitcher>
+        </MobileNav>
+      )}
     </HeaderContainer>
   );
 };
 
 export default Carousel;
-
-// const ContactInfoMobile = styled.div`
-//   font-size: 16px;
-//   color: white;
-//   margin-top: 20px; 
-//   text-align: center;
-//   padding: 10px;
-//   border-top: 1px solid rgba(255, 255, 255, 0.3);
-//   width: 100%;
-// `;
-
-
-// const LanguageSwitcherMobile = styled.div`
-//   color: white;
-//   margin-top: 15px;
-//   display: flex;
-//   gap: 15px; 
-//   justify-content: center;
-//   align-items: center;
-//   padding: 10px;
-// `;
 
 const DesktopNav = styled.nav`
   display: flex;
@@ -179,15 +125,14 @@ const MobileNav = styled(motion.nav)`
   top: 174px;
   left: 0;
   width: 100%;
-  // height: 100vh;
- background: url("assets/wooden.jpg") no-repeat center center;
+  background: url("assets/wooden.jpg") no-repeat center center;
   background-size: cover;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* Center items */
+  justify-content: center; 
   padding: 20px 0;
-  gap: 20px; /* More spacing */
+  gap: 20px; 
   z-index: 1000;
   
   @media (min-width: 769px) {
@@ -198,19 +143,7 @@ const MobileNav = styled(motion.nav)`
 const HeaderContainer = styled.div`
   display: flex;
   justify-content: center;
-  // position: relative;
   width: 100%;
-  // height: 90vh;
-  // display: flex;
-  // justify-content: center;
-  // align-items: center;
-  // overflow: hidden;
-
-  // img {
-  //   width: 100%;
-  //   height: 100%;
-  //   object-fit: cover;
-  // }
 `;
 
 const HeaderContent = styled.div`
@@ -252,21 +185,6 @@ const BurgerMenu = styled.div`
     right: 28px;
   }
 `;
-
-// const Nav = styled(motion.nav)`
-//   position: absolute;
-//   top: 204px;
-//   left: 0;
-//   width: 100%;
-//   background: url("assets/wooden.jpg") no-repeat center center;
-//   background-size: cover;
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   padding: 20px 0;
-//   gap: 15px;
-//   z-index: 100;
-// `;
 
 const NavItem = styled.a`
   text-decoration: none;
@@ -385,53 +303,5 @@ const LanguageSwitcher = styled.div`
     &:hover {
       color: #ffcc66;
     }
-  }
-`;
-
-
-const ImageWrapper = styled(motion.div)`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  img {
-    max-width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
-const TextOverlay = styled.div`
-  position: absolute;
-  color: white;
-  font-size: 2rem;
-  font-weight: bold;
-  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
-  text-align: center;
-  padding: 1rem;
-  bottom: 30%;
-  left: 5%;
-
-  @media (max-width: 768px) {
-    font-size: 1.25rem;
-  }
-`;
-
-const TextOverlaySmall = styled.div`
-  position: absolute;
-  color: white;
-  font-size: 1.25rem;
-  font-weight: bold;
-  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
-  text-align: center;
-  padding: 1rem;
-  bottom: 26%;
-  left: 5%;
-
-  @media (max-width: 768px) {
-    font-size: 0.75rem;
   }
 `;
