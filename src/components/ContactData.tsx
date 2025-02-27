@@ -318,6 +318,7 @@ const ErrorText = styled.span`
   color: #ff4d4d;
   margin-top: 0.3rem;
   font-weight: bold;
+  text-align: start;
 `;
 
 const BottomSection = styled.section`

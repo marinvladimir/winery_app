@@ -2,6 +2,7 @@ import { useIntl } from "react-intl";
 import styled, { keyframes } from "styled-components";
 import { useState } from "react";
 import { Section } from "./TourContent";
+import WineAndWood from "./WineAndWood";
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
@@ -180,6 +181,7 @@ const AboutSection = () => {
       </ImageGallery>
 
       <Content style={{ marginTop: "5rem" }}>
+        <WineAndWood/>
           <Section>
                   <p>{formatMessage({ id: "about.last.section.paragraph1" })}</p>
                   <p>{formatMessage({ id: "about.last.section.paragraph2" })}</p>
