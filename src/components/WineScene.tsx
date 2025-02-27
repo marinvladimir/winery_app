@@ -36,7 +36,7 @@ const WineBottle = () => {
 
 const WineScene = () => {
   return (
-    <Canvas style={{ width: "60px", height: "300px" }} camera={{ position: [70, 6, 17], fov: 50 }}>
+    <Canvas style={{ width: "80px", height: "300px" }} camera={{ position: [70, 6, 17], fov: 50 }}>
       <ambientLight intensity={0.5} />
       <directionalLight position={[3, 3, 3]} intensity={1} />
       <WineBottle />
