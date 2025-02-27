@@ -162,6 +162,8 @@ const HeaderContent = styled.div`
 
   @media (max-width: 768px) {
     justify-content: space-between;
+     backdrop-filter: blur(0px);
+       background: rgba(0, 0, 0, 0.3);
   }
 `;
 

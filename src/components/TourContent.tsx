@@ -137,7 +137,6 @@ const fadeIn = keyframes`
   to {
     opacity: 1;
     transform: translateY(0);
-    // transform: scale(1.05);
   }
 `;
 
@@ -151,39 +150,36 @@ export const HeroSection = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-
   filter: brightness(0.75);
   transition: transform 0.5s ease-in-out, filter 0.5s ease-in-out;
-
-  animation: ${fadeIn} 1s ease-out; 
+  animation: ${fadeIn} 1s ease-out;
 
   &:hover {
     filter: brightness(1.1);
     transform: scale(1.05);
+
+    @media (max-width: 768px) {
+ transform: scale(1.1);
+  }
+  }
+
+  @media (max-width: 768px) {
+    min-height: 50vh;
+    background-position: top;
   }
 `;
-
-
 
 export const HeroText = styled.h1`
   font-size: 38px;
   color: white;
   text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
-  font-family: 'georgia', sans-serif;
+  font-family: 'Georgia', sans-serif;
   padding: 20px;
   text-align: center;
 
   @media (max-width: 768px) {
-    font-size: 28px;
+    font-size: 22px;
   }
-`;
-
-
-
-const SliderContainer = styled.div`
-  width: 90%;
-  max-width: 800px;
-  margin: 32px auto;
 `;
 
 const StyledSlider = styled(Slider)`
@@ -193,16 +189,26 @@ const StyledSlider = styled(Slider)`
   }
 `;
 
+const SliderContainer = styled.div`
+  width: 90%;
+  max-width: 800px;
+  margin: 32px auto;
+
+  @media (max-width: 768px) {
+    width: 95%;
+  }
+`;
+
 const Slide = styled.div<{ $isActive: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
   width: 100%;
-  height: 500px;
+  height: 500px; /* Default height */
   pointer-events: ${({ $isActive }) => ($isActive ? "auto" : "none")};
   tabindex: ${({ $isActive }) => ($isActive ? "0" : "-1")};
-    ${({ $isActive }) => !$isActive && "inert: true;"}
+  ${({ $isActive }) => !$isActive && "inert: true;"}
 
   img {
     width: 100%;
@@ -211,7 +217,16 @@ const Slide = styled.div<{ $isActive: boolean }>`
     position: relative;
     z-index: 2;
   }
+
+  @media (max-width: 768px) {
+    height: 350px; /* Smaller height for mobile */
+  }
+
+  @media (max-width: 480px) {
+    height: 250px;
+  }
 `;
+
 
 
 const VisitCard = styled.div`

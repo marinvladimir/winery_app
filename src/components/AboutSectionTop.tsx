@@ -60,7 +60,7 @@ const AboutSection = () => {
           <h3 style={{
             borderBottom: "1px solid",
             padding: "1rem"
-          }}>{formatMessage({ id: "tour.heading1" })}</h3>
+          }}>{formatMessage({ id: "welcome.title" })}</h3>
           <p>{formatMessage({ id: "about.paragraph1" })}</p>
           <p>{formatMessage({ id: "about.paragraph2" })}</p>
         </Section>
