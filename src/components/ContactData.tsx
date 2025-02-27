@@ -145,7 +145,7 @@ const ContactData: React.FC = () => {
                 </ContactForm>
             </ContactContainer>
             <VisitorCounter>
-                <FormattedMessage id="visitor.count" /> {visitorCount}
+                <FormattedMessage id="visitor.count" /> <strong>{visitorCount}</strong>
             </VisitorCounter>
         </BottomSection>
     );
@@ -327,6 +327,7 @@ const VisitorCounter = styled.div`
   backdrop-filter: blur(12px);
 
   @media (max-width: 768px) {
+    font-size: 1rem;
     max-width: none;
   }
 `;
