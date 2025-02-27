@@ -230,8 +230,9 @@ const Slide = styled.div<{ $isActive: boolean }>`
 
 
 const VisitCard = styled.div`
-  background: url(/assets/paper-texture.jpg) no-repeat center, #f5e8d9;
-  border: 2px solid #5a1f1f;
+  background: url(/assets/visit.png) no-repeat center, #f5e8d9;
+  // border: 2px solid #5a1f1f;
+  opacity: 0.8;
   padding: 20px;
   border-radius: 10px;
   text-align: center;

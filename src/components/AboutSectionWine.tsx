@@ -90,7 +90,7 @@ const ReflectiveImage = styled.img`
   transition: all 0.3s ease-in-out;
   
   &:hover {
-    filter: brightness(1.3);
+    filter: brightness(1.75);
   }
 `;
 

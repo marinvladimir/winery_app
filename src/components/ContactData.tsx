@@ -189,6 +189,14 @@ const ContactInfo = styled.div`
   background: #fff;
   padding: 2rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: url(/assets/visit.png) no-repeat center, #f5e8d9;
+    // border: 1px solid #5a1f1f;r
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+    /* transform: rotate(-2deg); */
+    font-family: "Georgia", serif;
 
   h3 {
     font-size: 1.6rem;
@@ -196,6 +204,12 @@ const ContactInfo = styled.div`
     color: #7b1e25;
     text-transform: uppercase;
     text-align: center;
+    margin-top: 0rem;
+    letter-spacing: 1px;
+
+    @media (max-width: 768px) {
+    margin-top: 0rem;
+  }
   }
 
   p {
@@ -219,6 +233,7 @@ const ContactForm = styled.form`
   background: rgba(255, 255, 255, 0.95);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(12px);
+  opacity: 0.8;
   width: 100%;
   max-width: 500px;
 
@@ -232,9 +247,14 @@ const ContactForm = styled.form`
     font-size: 1.7rem;
     margin-bottom: 1rem;
     color: #7b1e25;
+    margin-top: 0;
     text-transform: uppercase;
     text-align: center;
     letter-spacing: 1px;
+
+    @media (max-width: 768px) {
+    margin-top: 0rem;
+  }
   }
 
   label {
