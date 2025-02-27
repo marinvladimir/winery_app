@@ -100,10 +100,16 @@ const ImageSection = styled.section<{ $bgImage: string }>`
   &:hover {
     filter: brightness(1.1);
     transform: scale(1.05);
+        @media (max-width: 768px) {
+ transform: scale(1.1);
+  }
+    }
+
+  @media (max-width: 768px) {
+    min-height: 50vh;
+    background-position: top;
   }
 `;
-
-
 
 const ContentSection = styled.section`
   background: white;
