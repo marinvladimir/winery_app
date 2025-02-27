@@ -64,7 +64,7 @@ const TourContent: React.FC = () => {
   return (
     <>
 
-<HeroSection>
+      <HeroSection>
         <HeroText>{formatMessage({ id: "tour.start" })}</HeroText>
       </HeroSection>
       <SliderContainer>

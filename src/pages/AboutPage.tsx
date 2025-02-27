@@ -2,10 +2,10 @@ import MotionBg from "../components/MotionBg";
 
 
 const AboutPage = () => {
-  
+
   return (
     <>
-    <MotionBg/>
+      <MotionBg />
     </>
   );
 };

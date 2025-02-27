@@ -4,34 +4,34 @@ import { useIntl } from "react-intl";
 import WineScene from "./WineScene";
 
 const Footer: React.FC = () => {
-    const { formatMessage } = useIntl();
+  const { formatMessage } = useIntl();
 
-    return (
-        <FooterWrapper>
-            <FooterContent>
-                <div>
-                    <FooterText>
-                        Marina Studina 59
-                        <br />
-                        21217 Kaštel Novi
-                    </FooterText>
-                    <Spacer />
-                    <FooterText>
-                        Anita Kuzmanić
-                        <br />
-                        098 9932 710
-                        <br />
-                        vinarija.kuzmanic@gmail.com
-                    </FooterText>
-                    <Separator />
-                    <FooterText>{formatMessage({ id: "footer.text" })}</FooterText>
-                </div>
-                <div>
-                    <WineScene />
-                </div>
-            </FooterContent>
-        </FooterWrapper>
-    );
+  return (
+    <FooterWrapper>
+      <FooterContent>
+        <div>
+          <FooterText>
+            Marina Studina 59
+            <br />
+            21217 Kaštel Novi
+          </FooterText>
+          <Spacer />
+          <FooterText>
+            Anita Kuzmanić
+            <br />
+            098 9932 710
+            <br />
+            vinarija.kuzmanic@gmail.com
+          </FooterText>
+          <Separator />
+          <FooterText>{formatMessage({ id: "footer.text" })}</FooterText>
+        </div>
+        <div>
+          <WineScene />
+        </div>
+      </FooterContent>
+    </FooterWrapper>
+  );
 };
 
 export default Footer;

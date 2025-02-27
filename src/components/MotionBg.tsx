@@ -51,7 +51,7 @@ const MotionBg: React.FC = () => {
         <MiniContainer>
           <ContentWrapper2>
             <AboutSectionWine />
-            <ContactData/>
+            <ContactData />
           </ContentWrapper2>
         </MiniContainer>
       </ContentSection>

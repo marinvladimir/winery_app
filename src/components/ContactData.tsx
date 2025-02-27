@@ -10,15 +10,15 @@ import { getVisitorCount, incrementVisitorCount } from "../utils/redisClient";
 import { EMAIL_SERVICE_PUBLIC_KEY, EMAIL_SERVICE_SERVICE_ID, EMAIL_SERVICE_TEMPLATE_ID } from "../config";
 
 const customIcon = new L.Icon({
-  iconUrl: "/leaflet/marker.png",
-  iconSize: [41, 41],
-  iconAnchor: [21, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
+    iconUrl: "/leaflet/marker.png",
+    iconSize: [41, 41],
+    iconAnchor: [21, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41],
 });
 
 interface ButtonProps {
-  $isDisabled: boolean;
+    $isDisabled: boolean;
 }
 
 export const LanguageButton = styled.button`
@@ -35,120 +35,120 @@ export const LanguageButton = styled.button`
 `;
 
 interface FormData {
-  from_name: string;
-  reply_to: string;
-  verification: string;
-  message: string;
+    from_name: string;
+    reply_to: string;
+    verification: string;
+    message: string;
 }
 
 const ContactData: React.FC = () => {
-  const { formatMessage } = useIntl();
-  const [visitorCount, setVisitorCount] = useState<number>(0);
+    const { formatMessage } = useIntl();
+    const [visitorCount, setVisitorCount] = useState<number>(0);
 
-  useEffect(() => {
-    async function fetchAndIncrement() {
-      const count = await getVisitorCount();
-      setVisitorCount(count);
-      if (!sessionStorage.getItem("visited")) {
-        const newCount = await incrementVisitorCount();
-        setVisitorCount(newCount);
-        sessionStorage.setItem("visited", "true");
-      }
-    }
-    fetchAndIncrement();
-  }, []);
+    useEffect(() => {
+        async function fetchAndIncrement() {
+            const count = await getVisitorCount();
+            setVisitorCount(count);
+            if (!sessionStorage.getItem("visited")) {
+                const newCount = await incrementVisitorCount();
+                setVisitorCount(newCount);
+                sessionStorage.setItem("visited", "true");
+            }
+        }
+        fetchAndIncrement();
+    }, []);
 
-  const [formData, setFormData] = useState<FormData>({
-    from_name: "",
-    reply_to: "",
-    verification: "",
-    message: "",
-  });
-  const [errors, setErrors] = useState<Partial<FormData>>({});
-  const [loading, setLoading] = useState<boolean>(false);
+    const [formData, setFormData] = useState<FormData>({
+        from_name: "",
+        reply_to: "",
+        verification: "",
+        message: "",
+    });
+    const [errors, setErrors] = useState<Partial<FormData>>({});
+    const [loading, setLoading] = useState<boolean>(false);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
-  const validateForm = (): boolean => {
-    let newErrors: Partial<FormData> = {};
+    const validateForm = (): boolean => {
+        let newErrors: Partial<FormData> = {};
 
-    if (!formData.from_name.trim()) newErrors.from_name = formatMessage({ id: "contact.name.error" })
-    if (!formData.reply_to.trim()) newErrors.reply_to = formatMessage({ id: "contact.email.error" })
-    if (formData.verification !== "557") newErrors.verification = formatMessage({ id: "contact.verification.error" })
-    if (!formData.message.trim()) newErrors.message = formatMessage({ id: "contact.message.error" })
+        if (!formData.from_name.trim()) newErrors.from_name = formatMessage({ id: "contact.name.error" })
+        if (!formData.reply_to.trim()) newErrors.reply_to = formatMessage({ id: "contact.email.error" })
+        if (formData.verification !== "557") newErrors.verification = formatMessage({ id: "contact.verification.error" })
+        if (!formData.message.trim()) newErrors.message = formatMessage({ id: "contact.message.error" })
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!validateForm()) return;
 
-    setLoading(true);
-    try {
-      await emailjs.send(
-        EMAIL_SERVICE_SERVICE_ID,
-        EMAIL_SERVICE_TEMPLATE_ID,
-        { ...formData } as Record<string, unknown>,
-        EMAIL_SERVICE_PUBLIC_KEY
-      );
-      toast.success("Poruka uspješno poslana!");
-      setFormData({ from_name: "", reply_to: "", verification: "", message: "" });
-    } catch (error) {
-      toast.error("Došlo je do greške. Pokušajte ponovo.");
-    } finally {
-      setLoading(false);
-    }
-  };
+        setLoading(true);
+        try {
+            await emailjs.send(
+                EMAIL_SERVICE_SERVICE_ID,
+                EMAIL_SERVICE_TEMPLATE_ID,
+                { ...formData } as Record<string, unknown>,
+                EMAIL_SERVICE_PUBLIC_KEY
+            );
+            toast.success("Poruka uspješno poslana!");
+            setFormData({ from_name: "", reply_to: "", verification: "", message: "" });
+        } catch (error) {
+            toast.error("Došlo je do greške. Pokušajte ponovo.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const position: [number, number] = [43.55579933989852, 16.336398404284003];
+    const position: [number, number] = [43.55579933989852, 16.336398404284003];
 
-  return (
-    <BottomSection>
-      <ContactContainer>
-        <ContactLeftSide>
-        <ContactInfo>
-          <h3>Contact Info</h3>
-          <p>Marina Studina 59</p>
-          <p>21217 Kaštel Novi</p>
-          <p><strong>Anita Kuzmanić</strong></p>
-          <p>📞 098 9932 710</p>
-          <p>✉️ <a href="mailto:vinarija.kuzmanic@gmail.com">vinarija.kuzmanic@gmail.com</a></p>
-        </ContactInfo>
-        <MyMap position={position} />
-</ContactLeftSide>
-        <ContactForm onSubmit={handleSubmit}>
-          <h3>{formatMessage({ id: "contact.title" })}</h3>
+    return (
+        <BottomSection>
+            <ContactContainer>
+                <ContactLeftSide>
+                    <ContactInfo>
+                        <h3>Contact Info</h3>
+                        <p>Marina Studina 59</p>
+                        <p>21217 Kaštel Novi</p>
+                        <p><strong>Anita Kuzmanić</strong></p>
+                        <p>📞 098 9932 710</p>
+                        <p>✉️ <a href="mailto:vinarija.kuzmanic@gmail.com">vinarija.kuzmanic@gmail.com</a></p>
+                    </ContactInfo>
+                    <MyMap position={position} />
+                </ContactLeftSide>
+                <ContactForm onSubmit={handleSubmit}>
+                    <h3>{formatMessage({ id: "contact.title" })}</h3>
 
-          <label>{formatMessage({ id: "contact.name" })}</label>
-          <input type="text" name="from_name" value={formData.from_name} onChange={handleChange} />
-          {errors.from_name && <ErrorText>{errors.from_name}</ErrorText>}
+                    <label>{formatMessage({ id: "contact.name" })}</label>
+                    <input type="text" name="from_name" value={formData.from_name} onChange={handleChange} />
+                    {errors.from_name && <ErrorText>{errors.from_name}</ErrorText>}
 
-          <label>{formatMessage({ id: "contact.email" })}</label>
-          <input type="email" name="reply_to" value={formData.reply_to} onChange={handleChange} />
-          {errors.reply_to && <ErrorText>{errors.reply_to}</ErrorText>}
+                    <label>{formatMessage({ id: "contact.email" })}</label>
+                    <input type="email" name="reply_to" value={formData.reply_to} onChange={handleChange} />
+                    {errors.reply_to && <ErrorText>{errors.reply_to}</ErrorText>}
 
-          <label>{formatMessage({ id: "contact.verification" })}</label>
-          <input type="text" name="verification" value={formData.verification} onChange={handleChange} />
-          {errors.verification && <ErrorText>{errors.verification}</ErrorText>}
+                    <label>{formatMessage({ id: "contact.verification" })}</label>
+                    <input type="text" name="verification" value={formData.verification} onChange={handleChange} />
+                    {errors.verification && <ErrorText>{errors.verification}</ErrorText>}
 
-          <label>{formatMessage({ id: "contact.message" })}</label>
-          <textarea name="message" rows={4} value={formData.message} onChange={handleChange}></textarea>
-          {errors.message && <ErrorText>{errors.message}</ErrorText>}
+                    <label>{formatMessage({ id: "contact.message" })}</label>
+                    <textarea name="message" rows={4} value={formData.message} onChange={handleChange}></textarea>
+                    {errors.message && <ErrorText>{errors.message}</ErrorText>}
 
-          <SubmitButton type="submit" $isDisabled={loading} disabled={loading}>
-            {loading ? formatMessage({ id: "contact.sending" }) : formatMessage({ id: "contact.send" })}
-          </SubmitButton>
-        </ContactForm>
-      </ContactContainer>
-      <VisitorCounter>
-        <FormattedMessage id="visitor.count" /> {visitorCount}
-      </VisitorCounter>
-    </BottomSection>
-  );
+                    <SubmitButton type="submit" $isDisabled={loading} disabled={loading}>
+                        {loading ? formatMessage({ id: "contact.sending" }) : formatMessage({ id: "contact.send" })}
+                    </SubmitButton>
+                </ContactForm>
+            </ContactContainer>
+            <VisitorCounter>
+                <FormattedMessage id="visitor.count" /> {visitorCount}
+            </VisitorCounter>
+        </BottomSection>
+    );
 };
 
 export default ContactData;

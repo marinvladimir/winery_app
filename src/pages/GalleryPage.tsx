@@ -4,14 +4,14 @@ import { HeroSection, HeroText } from "../components/TourContent";
 import { useIntl } from "react-intl";
 
 const GalleryPage: React.FC = () => {
-    const { formatMessage } = useIntl();
+  const { formatMessage } = useIntl();
 
   return (
     <PageWrapper>
       <ContentWrapper>
         <HeroSection>
-                <HeroText>{formatMessage({ id: "gallery.heading" })}</HeroText>
-              </HeroSection>
+          <HeroText>{formatMessage({ id: "gallery.heading" })}</HeroText>
+        </HeroSection>
       </ContentWrapper>
     </PageWrapper>
   );
