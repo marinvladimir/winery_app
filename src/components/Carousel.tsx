@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import styled from "styled-components";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useLanguage } from "../context/i18n";
-import { LanguageButton } from "../pages/AboutPage";
+import { LanguageButton } from "./MotionBg";
 
 const Carousel = () => {
   const { formatMessage } = useIntl();
@@ -11,18 +11,18 @@ const Carousel = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentHash, setCurrentHash] = useState(window.location.hash);
 
-  const images = [
-    { src: "assets/1-1.jpg", text: formatMessage({ id: "carousel.text1" }), extraText: formatMessage({ id: "carousel.text11" }) },
-    { src: "assets/2.jpg", text: formatMessage({ id: "carousel.text2" }) }
-  ];
+  // const images = [
+  //   { src: "assets/1-1.jpg", text: formatMessage({ id: "carousel.text1" }), extraText: formatMessage({ id: "carousel.text11" }) },
+  //   { src: "assets/2.jpg", text: formatMessage({ id: "carousel.text2" }) }
+  // ];
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 5000);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setIndex((prevIndex) => (prevIndex + 1) % images.length);
+  //   }, 5000);
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -82,7 +82,7 @@ const Carousel = () => {
 </HeaderRight>
 
       </HeaderContent>
-      <AnimatePresence>
+      {/* <AnimatePresence>
         <ImageWrapper
           key={images[index].src}
           initial={{ opacity: 0 }}
@@ -92,10 +92,10 @@ const Carousel = () => {
         >
           <img src={images[index].src} alt="Winery Image" />
         </ImageWrapper>
-      </AnimatePresence>
-      <TextOverlay>{images[index].text}</TextOverlay>
-      <TextOverlaySmall>{images[index].extraText}</TextOverlaySmall>
-      <AnimatePresence>
+      </AnimatePresence> */}
+      {/* <TextOverlay>{images[index].text}</TextOverlay>
+      <TextOverlaySmall>{images[index].extraText}</TextOverlaySmall> */}
+      {/* <AnimatePresence> */}
   {isMenuOpen && (
     <MobileNav
   initial={{ y: -100, opacity: 0 }}
@@ -135,7 +135,7 @@ const Carousel = () => {
 </MobileNav>
 
   )}
-</AnimatePresence>
+{/* </AnimatePresence> */}
 
     </HeaderContainer>
   );
@@ -176,7 +176,7 @@ const DesktopNav = styled.nav`
 
 const MobileNav = styled(motion.nav)`
   position: fixed;
-  top: 204px;
+  top: 174px;
   left: 0;
   width: 100%;
   // height: 100vh;
@@ -196,19 +196,21 @@ const MobileNav = styled(motion.nav)`
 `;
 
 const HeaderContainer = styled.div`
-  position: relative;
-  width: 100%;
-  height: 90vh;
   display: flex;
   justify-content: center;
-  align-items: center;
-  overflow: hidden;
+  // position: relative;
+  width: 100%;
+  // height: 90vh;
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
+  // overflow: hidden;
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+  // img {
+  //   width: 100%;
+  //   height: 100%;
+  //   object-fit: cover;
+  // }
 `;
 
 const HeaderContent = styled.div`

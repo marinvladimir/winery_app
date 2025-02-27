@@ -1,6 +1,7 @@
 import { useIntl } from "react-intl";
 import styled, { keyframes } from "styled-components";
 import { useState } from "react";
+import { Section } from "./TourContent";
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
@@ -13,28 +14,11 @@ const blurLoad = keyframes`
 `;
 
 const Container = styled.section`
-  // width: 90%;
-  max-width: 756px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #f5efe6; 
   padding: 3rem 2rem;
-  border-radius: 10px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
   animation: ${fadeIn} 1s ease-in-out;
-`;
-
-const Header = styled.h1`
-  font-size: 2.5rem;
-  font-family: "Playfair Display", serif;
-  font-weight: bold;
-  color: #7b1e25;
-  text-align: center;
-  margin-bottom: 2rem;
-  border-bottom: 3px solid #c0a080; 
-  display: inline-block;
-  padding-bottom: 0.5rem;
 `;
 
 const Content = styled.div`
@@ -48,19 +32,6 @@ const Content = styled.div`
     flex-direction: column;
     text-align: center;
   }
-`;
-
-const TextBlock = styled.div`
-  flex: 1;
-  font-family: "Cormorant Garamond", serif;
-  color: #4a3b3b;
-`;
-
-const Para = styled.p`
-  font-size: 1rem;
-  line-height: 1.8;
-  margin-bottom: 1rem;
-  color: #2d2d2d;
 `;
 
 const MainImage = styled.img`
@@ -78,17 +49,52 @@ const MainImage = styled.img`
 `;
 
 const ImageGallery = styled.div`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 2rem;
   width: 100%;
+  @media (max-width: 768px) {
+    width: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
   margin-top: 3rem;
-  align-items: center;
+  justify-items: center;
+  position: relative;
 `;
 
 const GalleryItem = styled.div`
+  position: relative;
   text-align: center;
+  transition: transform 0.3s ease-in-out;
+
+  &:nth-child(odd) {
+    transform: translateY(20px);
+      @media (max-width: 768px) {
+    transform: none;
+  }
+  }
+
+  &:hover {
+    transform: scale(1.05);
+  }
 `;
+
+const ReflectiveImage = styled.img`
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  animation: ${blurLoad} 1s ease-out;
+  transition: all 0.3s ease-in-out;
+  
+  &:hover {
+    filter: brightness(1.3);
+  }
+`;
+
+
 
 const GalleryTitle = styled.div`
   font-size: 1.5rem;
@@ -96,6 +102,10 @@ const GalleryTitle = styled.div`
   font-family: "Playfair Display", serif;
   color: #7b1e25;
   margin-bottom: 0.5rem;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
 `;
 
 // const GalleryImage = styled.img`
@@ -111,39 +121,39 @@ const GalleryTitle = styled.div`
 //   }
 // `;
 
-const ReflectiveImage = styled.img`
-  position: relative;
-  width: 100%;
-  max-width: 500px;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  animation: ${blurLoad} 1s ease-out;
-  transition: all 0.5s ease-in-out;
+// const ReflectiveImage = styled.img`
+//   position: relative;
+//   width: 100%;
+//   max-width: 500px;
+//   border-radius: 8px;
+//   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+//   animation: ${blurLoad} 1s ease-out;
+//   transition: all 0.5s ease-in-out;
 
-  &::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
-    transform: skewX(-20deg);
-    transition: left 0.8s ease-in-out;
-  }
+//   &::after {
+//     content: "";
+//     position: absolute;
+//     top: 0;
+//     left: -100%;
+//     width: 50%;
+//     height: 100%;
+//     background: linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+//     transform: skewX(-20deg);
+//     transition: left 0.8s ease-in-out;
+//   }
 
-    @media (max-width: 768px) {
-    max-width: 100%;
-  }
+//     @media (max-width: 768px) {
+//     max-width: 100%;
+//   }
 
-  &:hover::after {
-    left: 120%;
-  }
+//   &:hover::after {
+//     left: 120%;
+//   }
 
-  &:hover {
-    filter: brightness(1.5);
-  }
-`;
+//   &:hover {
+//     filter: brightness(1.5);
+//   }
+// `;
 
 const AboutSection = () => {
   const { formatMessage } = useIntl();
@@ -151,22 +161,10 @@ const AboutSection = () => {
 
   return (
     <Container>
-      <Header>{formatMessage({ id: "welcome.title" })}</Header>
-
-      <Content>
-        <TextBlock>
-          <Para>{formatMessage({ id: "about.paragraph1" })}</Para>
-          <Para>{formatMessage({ id: "about.paragraph2" })}</Para>
-          <Para>{formatMessage({ id: "about.paragraph3" })}</Para>
-        </TextBlock>
-        <MainImage
-          src="assets/pk.jpg"
-          alt="Winery"
-          className={loaded ? "loaded" : ""}
-          onLoad={() => setLoaded(true)}
-        />
-      </Content>
-
+       <Section>
+      <h3 style={{borderBottom: "1px solid",
+            padding: "1rem"}}>{formatMessage({ id: "carousel.text3" })}</h3>
+            </Section>
       <ImageGallery>
         {[
           { name: "Crljenak", src: "assets/1.jpg" },
@@ -181,11 +179,12 @@ const AboutSection = () => {
         ))}
       </ImageGallery>
 
-      <Content style={{ marginTop: "2rem" }}>
-        <TextBlock>
-          <Para>{formatMessage({ id: "about.last.section.paragraph1" })}</Para>
-          <Para>{formatMessage({ id: "about.last.section.paragraph2" })}</Para>
-        </TextBlock>
+      <Content style={{ marginTop: "5rem" }}>
+          <Section>
+                  <p>{formatMessage({ id: "about.last.section.paragraph1" })}</p>
+                  <p>{formatMessage({ id: "about.last.section.paragraph2" })}</p>
+                </Section>
+               
         <MainImage
           src="assets/fb.jpg"
           alt="Winery"

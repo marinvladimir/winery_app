@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useIntl } from "react-intl";
 import Slider from "react-slick";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 const TourContent: React.FC = () => {
   const { formatMessage } = useIntl();
@@ -63,7 +63,10 @@ const TourContent: React.FC = () => {
 
   return (
     <>
-      <Header>{formatMessage({ id: "tour.start" })}</Header>
+
+<HeroSection>
+        <HeroText>{formatMessage({ id: "tour.start" })}</HeroText>
+      </HeroSection>
       <SliderContainer>
         <StyledSlider ref={sliderRef} {...settings}>
           {Array.from({ length: 9 }, (_, i) => (
@@ -126,11 +129,61 @@ const TourContent: React.FC = () => {
 
 export default TourContent;
 
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    // transform: scale(1.05);
+  }
+`;
+
+export const HeroSection = styled.div`
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-image: url("/assets/f3.jpg");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  filter: brightness(0.75);
+  transition: transform 0.5s ease-in-out, filter 0.5s ease-in-out;
+
+  animation: ${fadeIn} 1s ease-out; 
+
+  &:hover {
+    filter: brightness(1.1);
+    transform: scale(1.05);
+  }
+`;
+
+
+
+export const HeroText = styled.h1`
+  font-size: 38px;
+  color: white;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
+  font-family: 'georgia', sans-serif;
+  padding: 20px;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    font-size: 28px;
+  }
+`;
+
+
 
 const SliderContainer = styled.div`
   width: 90%;
   max-width: 800px;
-  margin: 20px auto;
+  margin: 32px auto;
 `;
 
 const StyledSlider = styled(Slider)`
@@ -213,20 +266,20 @@ const VisitCard = styled.div`
   }
 `;
 
-const Header = styled.h2`
-  background-image: url(/assets/wooden.jpg);
-  background-size: cover;
-  background-position: center;
-  color: #f5e8d9;
-  margin: 0;
-  margin-top: 16px;
-  padding: 23px;
-  text-align: center;
-  font-family: "Playfair Display", serif;
-  box-shadow: inset 0px -5px 8px rgba(0, 0, 0, 0.3);
-`
+// const Header = styled.h2`
+//   background-image: url(/assets/wooden.jpg);
+//   background-size: cover;
+//   background-position: center;
+//   color: #f5e8d9;
+//   margin: 0;
+//   margin-top: 16px;
+//   padding: 23px;
+//   text-align: center;
+//   font-family: "Playfair Display", serif;
+//   box-shadow: inset 0px -5px 8px rgba(0, 0, 0, 0.3);
+// `
 
-const Separator = styled.div`
+export const Separator = styled.div`
   width: 100px;
   height: 3px;
   background: #8a2c2c;
@@ -244,7 +297,7 @@ const TourWrapper = styled.div`
   }
 `;
 
-const Section = styled.div`
+export const Section = styled.div`
   margin-bottom: 20px;
 
   h3 {

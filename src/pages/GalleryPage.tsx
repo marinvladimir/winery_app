@@ -1,11 +1,17 @@
 import React from "react";
 import styled from "styled-components";
+import { HeroSection, HeroText } from "../components/TourContent";
+import { useIntl } from "react-intl";
 
 const GalleryPage: React.FC = () => {
+    const { formatMessage } = useIntl();
 
   return (
     <PageWrapper>
       <ContentWrapper>
+        <HeroSection>
+                <HeroText>{formatMessage({ id: "gallery.heading" })}</HeroText>
+              </HeroSection>
       </ContentWrapper>
     </PageWrapper>
   );
@@ -20,7 +26,7 @@ const ContentWrapper = styled.main`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  overflow-x: hidden;
+  // overflow-x: hidden;
 `;
 
 const PageWrapper = styled.div`
