@@ -1,0 +1,48 @@
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, useGLTF } from "@react-three/drei";
+import { useRef, useEffect } from "react";
+import { useFrame } from "@react-three/fiber";
+import * as THREE from "three";
+
+const centerObject = (scene: THREE.Group) => {
+  const bbox = new THREE.Box3().setFromObject(scene);  
+  const center = new THREE.Vector3();
+  bbox.getCenter(center);  
+  scene.position.sub(center);  
+};
+
+const Barrel = () => {
+  const { scene } = useGLTF("/assets/barrel.glb");
+  const bottleRef = useRef<THREE.Group>(null);
+
+  useEffect(() => {
+    if (scene) {
+      centerObject(scene);  
+    }
+  }, [scene]);
+
+  useFrame(() => {
+    if (bottleRef.current) {
+      bottleRef.current.rotation.y += 0.015; 
+    }
+  });
+
+  return (
+    <group ref={bottleRef}>
+      <primitive object={scene} scale={[0.1, 0.1, 0.1]} />
+    </group>
+  );
+};
+
+const BarrelScene = () => {
+  return (
+    <Canvas style={{ width: "300px", height: "300px" }} camera={{ position: [70, 6, 17], fov: 10 }}>
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[3, 3, 3]} intensity={1} />
+      <Barrel />
+      <OrbitControls enableZoom={false} enablePan={false} enableRotate={false} />
+    </Canvas>
+  );
+};
+
+export default BarrelScene;

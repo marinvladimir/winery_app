@@ -41,7 +41,7 @@ const WineAndWood = () => {
       <ambientLight intensity={0.7} />
       <directionalLight position={[3, 3, 3]} intensity={4} />
       <WoodenTable />
-      <OrbitControls enableZoom={false} />
+      <OrbitControls enableZoom={false} enablePan={false} />
     </Canvas>
   );
 };

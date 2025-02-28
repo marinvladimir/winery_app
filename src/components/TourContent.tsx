@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useIntl } from "react-intl";
 import Slider from "react-slick";
 import styled, { keyframes } from "styled-components";
+import BarrelScene from "./Barrel";
 
 const TourContent: React.FC = () => {
   const { formatMessage } = useIntl();
@@ -76,8 +77,9 @@ const TourContent: React.FC = () => {
           ))}
         </StyledSlider>
       </SliderContainer>
-
-      <TourWrapper>
+      <div style={{marginBottom: "16px"}}>
+      <BarrelScene />
+      </div><TourWrapper>
         <Separator />
         <Section>
           <h3>{formatMessage({ id: "tour.heading1" })}</h3>
@@ -193,6 +195,7 @@ const SliderContainer = styled.div`
   width: 90%;
   max-width: 800px;
   margin: 32px auto;
+  margin-bottom: 0;
 
   @media (max-width: 768px) {
     width: 95%;
