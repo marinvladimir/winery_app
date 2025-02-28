@@ -37,8 +37,8 @@ const Barrel = () => {
 const BarrelScene = () => {
   return (
     <Canvas style={{ width: "300px", height: "300px" }} camera={{ position: [70, 6, 17], fov: 10 }}>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[3, 3, 3]} intensity={1} />
+      <ambientLight intensity={0.75} />
+      <directionalLight position={[15, 33, 53]} intensity={2.5} />
       <Barrel />
       <OrbitControls enableZoom={false} enablePan={false} enableRotate={false} />
     </Canvas>
