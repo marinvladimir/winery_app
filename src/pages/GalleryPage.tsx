@@ -57,13 +57,13 @@ const GalleryPage: React.FC = () => {
                   <StyledImage
                   key={index}
                   src={image}
+                  $cursor={index === currentIndex}
                   alt={`Gallery image ${index + 1}`}
                   style={{
                     transform: `translateX(${offset * 120}px) scale(${index === currentIndex ? 1 : 0.85})`,
-                    opacity: index === currentIndex ? 1 : 0.6,
                     zIndex: index === currentIndex ? 2 : 1
                   }}
-                  onClick={() => openZoomedImage(index)}
+                  onClick={() => index === currentIndex && openZoomedImage(index)}
                 />
                 );
               })}
@@ -101,7 +101,10 @@ const fadeIn = keyframes`
   to { opacity: 1; transform: scale(1); }
 `;
 
-const Image = styled.img`
+
+const StyledImage = styled.img<{ $cursor?: boolean }>`
+  position: absolute;
+  transition: transform 0.3s ease, opacity 0.3s ease;
   position: absolute;
   transition: 
   transform 0.5s ease-out, 
@@ -111,22 +114,15 @@ const Image = styled.img`
     
   max-width: 100%;
   max-height: 100%;
-  cursor: pointer;
+  ${({ $cursor }) => ($cursor ? "cursor: pointer;" : "")}
   object-fit: cover;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
 
   &:hover {
-    transform: scale(1.08);
+    transform: scale(1.1);
     filter: brightness(1.05) contrast(1.1) saturate(1.15) drop-shadow(0 0 6px rgba(150, 50, 75, 0.3));
     border: 1px solid rgba(123, 30, 37, 0.3);
   }
-`;
-
-
-const StyledImage = styled(Image)`
-  position: absolute;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  cursor: pointer;
 `;
 
 const PageWrapper = styled.div`
