@@ -121,7 +121,7 @@ const TourContent: React.FC = () => {
           <a href="mailto:vinarija.kuzmanic@gmail.com">📧 vinarija.kuzmanic@gmail.com</a>
           <p>{formatMessage({ id: "tour.info2" })}</p>
           <a href="tel:+385989932710">📞 +385 (0)98 993 2710</a>
-          <a href="http://vinaantekuzmanic.com/" target="_blank" rel="noopener noreferrer">
+          <a href="https://vinarijakuzmanic.com/" target="_blank" rel="noopener noreferrer">
             🌍 vinaantekuzmanic.com
           </a>
         </VisitCard>
