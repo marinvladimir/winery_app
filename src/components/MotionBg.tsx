@@ -76,8 +76,8 @@ const PageWrapper = styled.div`
 
 const Description = styled.p`
   font-size: 1.2rem;
- color: #ff7171;
-   line-height: 1.6;
+  color: rgb(251 199 45);
+  line-height: 1.6;
 `;
 
 
@@ -130,7 +130,7 @@ const Title = styled.h1`
   text-transform: uppercase;
   letter-spacing: 2px;
   margin-bottom: 1rem;
-  color: #ff7171;
+  color: rgb(251 199 45);
   
   @media (max-width: 900px) {
     font-size: 1.75rem; 

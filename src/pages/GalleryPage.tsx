@@ -119,9 +119,12 @@ const StyledImage = styled.img<{ $cursor?: boolean }>`
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
 
   &:hover {
-    transform: scale(1.1);
-    filter: brightness(1.05) contrast(1.1) saturate(1.15) drop-shadow(0 0 6px rgba(150, 50, 75, 0.3));
-    border: 1px solid rgba(123, 30, 37, 0.3);
+    // transform: scale(1.1);
+    ${({ $cursor }) => ($cursor ? "scale(1.1);" : "")}
+    //  filter: brightness(1.05) contrast(1.1) saturate(1.15) drop-shadow(0 0 6px rgba(150, 50, 75, 0.3));
+    ${({ $cursor }) => ($cursor ? "filter: brightness(1.05) contrast(1.1) saturate(1.15) drop-shadow(0 0 6px rgba(150, 50, 75, 0.3));" : "")}
+    //  border: 1px solid rgba(123, 30, 37, 0.3);
+    ${({ $cursor }) => ($cursor ? "border: 1px solid rgba(123, 30, 37, 0.3);" : "")}
   }
 `;
 
