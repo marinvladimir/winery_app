@@ -122,7 +122,7 @@ const TourContent: React.FC = () => {
           <p>{formatMessage({ id: "tour.info2" })}</p>
           <a href="tel:+385989932710">📞 +385 (0)98 993 2710</a>
           <a href="https://vinarijakuzmanic.com/" target="_blank" rel="noopener noreferrer">
-            🌍 vinaantekuzmanic.com
+            🌍 vinarijakuzmanic.com
           </a>
         </VisitCard>
       </TourWrapper>      </>
