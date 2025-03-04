@@ -164,6 +164,7 @@ const HeaderContent = styled.div`
     justify-content: space-between;
      backdrop-filter: blur(0px);
        background: rgba(0, 0, 0, 0.3);
+        padding: 12px 0;
   }
 `;
 
