@@ -177,7 +177,7 @@ const BurgerMenu = styled.div`
   cursor: pointer;
 
   img {
-    width: 56px;
+    width: 24px;
     height: auto;
   }
 
@@ -185,7 +185,7 @@ const BurgerMenu = styled.div`
     display: flex;
     position: absolute;
     top: 8px;
-    right: 28px;
+    right: 8px;
   }
 `;
 
