@@ -111,8 +111,7 @@ const TourContent: React.FC = () => {
               <strong>{formatMessage({ id: "tour.details13" })}</strong>{formatMessage({ id: "tour.details14" })}
             </p>
           </DetailsContent>
-
-          <PriceTag>{formatMessage({ id: "tour.details12" })}</PriceTag>
+          <PriceTag>{formatMessage({ id: "tour.details15" })}</PriceTag>
         </Details>
         <ClosingText>{formatMessage({ id: "tour.end" })}</ClosingText>
         <VisitCard>
