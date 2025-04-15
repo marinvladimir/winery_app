@@ -35,7 +35,7 @@ const Carousel = () => {
       <HeaderContent>
         <Logo src="assets/logo.png" />
         <BurgerMenu onClick={() => setIsMenuOpen((prev) => !prev)}>
-          <img src="assets/wn_btn.png" alt="Menu" />
+          <img src="assets/wn_btn.svg" alt="Menu" />
         </BurgerMenu>
         <DesktopNav>
           {[
