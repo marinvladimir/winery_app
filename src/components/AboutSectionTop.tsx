@@ -2,6 +2,7 @@ import { useIntl } from "react-intl";
 import styled from "styled-components";
 import Reveal, { RevealItem } from "./Reveal";
 import RevealImage from "./RevealImage";
+import VineFlourish from "./decor/VineFlourish";
 import { Container, Divider, Eyebrow, Lead, MediaFrame, Section, SectionTitle } from "./ui";
 
 const AboutSectionTop = () => {
@@ -32,6 +33,9 @@ const AboutSectionTop = () => {
         <Row $reverse>
           <Text>
             <Quote>{formatMessage({ id: "about.paragraph3" })}</Quote>
+            <QuoteVine>
+              <VineFlourish />
+            </QuoteVine>
           </Text>
           <MediaFrame $ratio="3 / 2" $offset="left">
             <RevealImage src="assets/f3.jpg" alt={formatMessage({ id: "photo.f3" })} />
@@ -72,6 +76,15 @@ const Row = styled.div<{ $reverse?: boolean }>`
 
 const Text = styled(Reveal)`
   max-width: 60ch;
+`;
+
+const QuoteVine = styled.div`
+  margin: 2rem 0 0 1.5rem;
+  max-width: 200px;
+
+  svg {
+    width: 100%;
+  }
 `;
 
 const Quote = styled.p`

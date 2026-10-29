@@ -3,6 +3,7 @@ import { animate, motion, useInView, useReducedMotion } from "framer-motion";
 import { useIntl } from "react-intl";
 import styled from "styled-components";
 import { Container } from "./ui";
+import WineDrip from "./decor/WineDrip";
 import { fadeUp, inViewProps, staggerContainer } from "./motionVariants";
 
 const STATS = [
@@ -64,6 +65,7 @@ const StatsStrip = () => {
           ))}
         </List>
       </Container>
+      <WineDrip />
     </Strip>
   );
 };
@@ -72,11 +74,11 @@ export default StatsStrip;
 
 const Strip = styled.section`
   position: relative;
-  overflow: hidden;
+  z-index: 3;
   padding-block: clamp(3rem, 6vw, 4.5rem);
   background:
-    radial-gradient(circle at 15% 50%, rgba(201, 164, 92, 0.12), transparent 45%),
-    radial-gradient(circle at 85% 50%, rgba(201, 164, 92, 0.1), transparent 45%),
+    radial-gradient(ellipse 35% 60% at 15% 35%, rgba(201, 164, 92, 0.12), transparent 70%),
+    radial-gradient(ellipse 35% 60% at 85% 35%, rgba(201, 164, 92, 0.1), transparent 70%),
     var(--wine-900);
   color: var(--white);
 `;

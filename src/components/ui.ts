@@ -15,7 +15,9 @@ export const Container = styled.div<{ $narrow?: boolean }>`
 
 export const Section = styled.section<{ $tone?: "white" | "cream" }>`
   padding-block: clamp(4rem, 9vw, 7rem);
-  background: ${({ $tone }) => ($tone === "cream" ? "var(--cream)" : "var(--white)")};
+  background-color: ${({ $tone }) => ($tone === "cream" ? "var(--cream)" : "var(--white)")};
+  background-image: ${({ $tone }) => ($tone === "cream" ? "var(--paper-grain)" : "none")};
+  position: relative;
   scroll-margin-top: var(--header-h);
 `;
 
@@ -181,5 +183,18 @@ export const MediaFrame = styled.figure<{ $ratio?: string; $offset?: "left" | "r
       transform: ${({ $offset }) =>
         $offset === "left" ? "translate(-8px, 8px)" : "translate(8px, 8px)"};
     }
+  }
+`;
+
+/** Positions a decorative vine in the top corner of a section on wide screens. */
+export const CornerFlourish = styled.div<{ $side: "left" | "right" }>`
+  position: absolute;
+  top: clamp(1.5rem, 3vw, 2.5rem);
+  ${({ $side }) => $side}: clamp(1rem, 4vw, 4rem);
+  opacity: 0.85;
+  pointer-events: none;
+
+  @media (max-width: 1099px) {
+    display: none;
   }
 `;

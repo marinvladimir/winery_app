@@ -12,6 +12,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import BackToTop from "./components/BackToTop";
+import ClickSplash from "./components/decor/ClickSplash";
 
 const SkipLink = () => {
   const { formatMessage } = useIntl();
@@ -61,6 +62,7 @@ function App() {
           </main>
           <Footer />
           <BackToTop />
+          <ClickSplash />
         </Router>
         <ToastContainer position="top-right" autoClose={4000} />
       </MotionConfig>

@@ -1,8 +1,11 @@
 import { lazy } from "react";
 import { useIntl } from "react-intl";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { motion } from "framer-motion";
 import DeferredScene from "./DeferredScene";
+import Ornament from "./decor/Ornament";
+import VineFlourish from "./decor/VineFlourish";
+import { CornerFlourish } from "./ui";
 import Reveal, { RevealItem } from "./Reveal";
 import RevealImage from "./RevealImage";
 import { fadeUp, inViewProps, staggerContainer } from "./motionVariants";
@@ -32,13 +35,19 @@ const AboutSectionWine = () => {
   return (
     <>
       <Section $tone="cream" aria-labelledby="wines-title">
+        <CornerFlourish $side="left">
+          <VineFlourish />
+        </CornerFlourish>
+        <CornerFlourish $side="right">
+          <VineFlourish flip />
+        </CornerFlourish>
         <Container>
           <SectionHeader>
             <Reveal>
               <Eyebrow>{formatMessage({ id: "wine.eyebrow" })}</Eyebrow>
               <SectionTitle id="wines-title">{formatMessage({ id: "carousel.text3" })}</SectionTitle>
             </Reveal>
-            <Divider />
+            <Ornament />
             <Reveal delay={0.15}>
               <p>{formatMessage({ id: "wine.intro" })}</p>
             </Reveal>
@@ -192,14 +201,48 @@ const Badge = styled.span<{ $premium: boolean }>`
   }
 `;
 
+const WAVE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='14' viewBox='0 0 120 14'%3E%3Cpath d='M0 7 Q15 0 30 7 T60 7 T90 7 T120 7 V14 H0Z' fill='%236e1a24'/%3E%3C/svg%3E")`;
+
+const waveFlow = keyframes`
+  from { background-position: 0 0, 0 13px; }
+  to { background-position: 120px 0, 0 13px; }
+`;
+
+/* On hover the label "fills up" with wine, with a moving wavy surface. */
 const WineInfo = styled.div`
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   padding: 1rem 1.25rem 1.25rem;
   text-align: center;
+
+  &::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: calc(100% + 14px);
+    background:
+      ${WAVE} repeat-x,
+      linear-gradient(var(--wine-700), var(--wine-900)) no-repeat;
+    background-size: 120px 14px, 100% 100%;
+    background-position: 0 0, 0 13px;
+    transform: translateY(100%);
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: ${waveFlow} 2.4s linear infinite;
+  }
+
+  ${WineCard}:hover &::before {
+    transform: translateY(0);
+  }
 
   h3 {
     margin: 0 0 0.25rem;
     font-size: clamp(1.0625rem, 2vw, 1.375rem);
     color: var(--wine-700);
+    transition: color 0.4s ease;
   }
 
   span {
@@ -209,6 +252,15 @@ const WineInfo = styled.div`
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--muted);
+    transition: color 0.4s ease;
+  }
+
+  ${WineCard}:hover & h3 {
+    color: var(--white);
+  }
+
+  ${WineCard}:hover & span {
+    color: var(--gold-light);
   }
 `;
 

@@ -10,9 +10,11 @@ import { EMAIL_SERVICE_PUBLIC_KEY, EMAIL_SERVICE_SERVICE_ID, EMAIL_SERVICE_TEMPL
 import { CONTACT } from "../data/contact";
 import { motion } from "framer-motion";
 import { CheckIcon, MailIcon, MapPinIcon, PhoneIcon, UserIcon } from "./Icons";
+import Ornament from "./decor/Ornament";
+import VineFlourish from "./decor/VineFlourish";
 import Reveal from "./Reveal";
 import { fadeUp, inViewProps, staggerContainer } from "./motionVariants";
-import { buttonPrimary, Container, Divider, Eyebrow, Section, SectionHeader, SectionTitle } from "./ui";
+import { buttonPrimary, Container, CornerFlourish, Eyebrow, Section, SectionHeader, SectionTitle } from "./ui";
 
 const markerIcon = new L.Icon({
   iconUrl: "leaflet/marker.png",
@@ -135,13 +137,16 @@ const ContactData: React.FC = () => {
 
   return (
     <Section id="contact" $tone="cream" tabIndex={-1} aria-labelledby="contact-title">
+      <CornerFlourish $side="right">
+        <VineFlourish flip />
+      </CornerFlourish>
       <Container>
         <SectionHeader>
           <Reveal>
             <Eyebrow>{formatMessage({ id: "contact.eyebrow" })}</Eyebrow>
             <SectionTitle id="contact-title">{formatMessage({ id: "contact.heading" })}</SectionTitle>
           </Reveal>
-          <Divider />
+          <Ornament />
           <Reveal delay={0.15}>
             <p>{formatMessage({ id: "contact.intro" })}</p>
           </Reveal>

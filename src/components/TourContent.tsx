@@ -3,6 +3,9 @@ import { useIntl } from "react-intl";
 import Slider, { Settings } from "react-slick";
 import styled from "styled-components";
 import { motion, useScroll, useSpring } from "framer-motion";
+import Ornament from "./decor/Ornament";
+import VineFlourish from "./decor/VineFlourish";
+import WineDrip from "./decor/WineDrip";
 import Reveal from "./Reveal";
 import { fadeUp, fadeUpDelayed, inViewProps, staggerContainer } from "./motionVariants";
 import { CONTACT } from "../data/contact";
@@ -15,7 +18,7 @@ import {
   buttonOutline,
   buttonPrimary,
   Container,
-  Divider,
+  CornerFlourish,
   Eyebrow,
   Section,
   SectionHeader,
@@ -80,6 +83,9 @@ const TourContent: React.FC = () => {
       />
 
       <Section aria-labelledby="tour-program-title">
+        <CornerFlourish $side="left">
+          <VineFlourish />
+        </CornerFlourish>
         <Container $narrow>
           <SliderFrame
             aria-roledescription="carousel"
@@ -110,7 +116,7 @@ const TourContent: React.FC = () => {
               <Eyebrow>{formatMessage({ id: "tour.program.eyebrow" })}</Eyebrow>
               <SectionTitle id="tour-program-title">{formatMessage({ id: "tour.program.title" })}</SectionTitle>
             </Reveal>
-            <Divider />
+            <Ornament />
           </SectionHeader>
 
           <Steps ref={stepsRef}>
@@ -184,6 +190,7 @@ const TourContent: React.FC = () => {
               <GlobeIcon size={16} />
               {CONTACT.websiteDisplay}
             </WebsiteLink>
+            <CardDrip />
           </VisitCard>
         </Container>
       </Section>
@@ -396,7 +403,16 @@ const ClosingText = styled(motion.p)`
   }
 `;
 
+// Overlaps the card so the liquid band blends into it instead of forming a ledge.
+const CardDrip = styled(WineDrip)`
+  top: calc(100% - 16px);
+  left: 14px;
+  right: 14px;
+  height: clamp(60px, 7vw, 100px);
+`;
+
 const VisitCard = styled(motion.div)`
+  position: relative;
   max-width: 520px;
   margin: 0 auto;
   padding: clamp(2rem, 4vw, 2.75rem);

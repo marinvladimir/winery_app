@@ -3,6 +3,7 @@ import styled, { keyframes } from "styled-components";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useIntl } from "react-intl";
 import { EASE_OUT } from "./motionVariants";
+import Ambient, { AmbientKind } from "./decor/Ambient";
 
 interface PageHeroProps {
   image: string;
@@ -14,6 +15,8 @@ interface PageHeroProps {
   position?: string;
   /** Show the animated "scroll down" cue (full-size heroes only). */
   scrollCue?: boolean;
+  /** Decorative atmosphere: drifting fireflies or falling vine leaves. */
+  ambient?: AmbientKind;
   children?: React.ReactNode;
 }
 
@@ -41,6 +44,7 @@ const PageHero: React.FC<PageHeroProps> = ({
   size = "full",
   position = "center",
   scrollCue = false,
+  ambient,
   children,
 }) => {
   const { formatMessage } = useIntl();
@@ -66,6 +70,7 @@ const PageHero: React.FC<PageHeroProps> = ({
       <BackdropMotion style={reducedMotion ? undefined : { y: backdropY }} aria-hidden="true">
         <Backdrop style={{ backgroundImage: `url("${image}")`, backgroundPosition: position }} />
       </BackdropMotion>
+      {ambient && <Ambient kind={ambient} />}
 
       <Inner
         style={reducedMotion || !isTopHero ? undefined : { y: contentY, opacity: contentOpacity }}
@@ -161,7 +166,7 @@ const Backdrop = styled.div`
 
 const Inner = styled(motion.div)`
   position: relative;
-  z-index: 1;
+  z-index: 2;
   max-width: 920px;
 `;
 
@@ -235,7 +240,7 @@ const Actions = styled(motion.div)`
 
 const ScrollCue = styled(motion.button)`
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   bottom: 28px;
   left: 50%;
   width: 28px;

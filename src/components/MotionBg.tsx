@@ -27,6 +27,7 @@ const MotionBg: React.FC = () => {
         title={formatMessage({ id: "carousel.text2" })}
         subtitle={formatMessage({ id: "home.hero.subtitle" })}
         scrollCue
+        ambient="fireflies"
       >
         <PrimaryLink to="/tour">
           {formatMessage({ id: "home.hero.cta.tour" })}
@@ -47,6 +48,7 @@ const MotionBg: React.FC = () => {
         eyebrow={formatMessage({ id: "home.band.eyebrow" })}
         title={formatMessage({ id: "carousel.text1" })}
         subtitle={formatMessage({ id: "carousel.text11" })}
+        ambient="leaves"
       />
 
       <AboutSectionWine />
