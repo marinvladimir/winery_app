@@ -16,11 +16,37 @@ import Reveal from "./Reveal";
 import { fadeUp, inViewProps, staggerContainer } from "./motionVariants";
 import { buttonPrimary, Container, CornerFlourish, Eyebrow, Section, SectionHeader, SectionTitle } from "./ui";
 
-const markerIcon = new L.Icon({
-  iconUrl: "leaflet/marker.png",
-  iconSize: [41, 41],
-  iconAnchor: [21, 41],
-  popupAnchor: [0, -36],
+const GRAPE_PIN_BERRIES: [number, number][] = [
+  [17, 18], [22, 18], [27, 18],
+  [19.5, 22.5], [24.5, 22.5],
+  [22, 27],
+];
+
+// Map pin shaped like a drop, in ripe-grape purple with a little cluster inside.
+const markerIcon = L.divIcon({
+  className: "grape-pin",
+  html: `
+    <svg width="44" height="56" viewBox="0 0 44 56" aria-hidden="true" focusable="false">
+      <defs>
+        <radialGradient id="grape-pin-skin" cx="35%" cy="28%" r="75%">
+          <stop offset="0" stop-color="#8a5aa6" />
+          <stop offset="0.55" stop-color="#5a2d6b" />
+          <stop offset="1" stop-color="#2e1238" />
+        </radialGradient>
+      </defs>
+      <path d="M22 2 C11 2 3 10.5 3 21 C3 35 22 53 22 53 C22 53 41 35 41 21 C41 10.5 33 2 22 2 Z"
+        fill="url(#grape-pin-skin)" stroke="#f8f3ea" stroke-width="2" />
+      <circle cx="22" cy="21" r="12" fill="#f8f3ea" />
+      <path d="M22 13 C22 11 23 9.5 25 9" stroke="#3d0d14" stroke-width="1.2" fill="none" stroke-linecap="round" />
+      <path d="M23 11.5 C25.5 8.5 30 9 31 11 C28.5 12.6 25.5 12.8 23 11.5 Z" fill="#c9a45c" />
+      ${GRAPE_PIN_BERRIES.map(
+        ([cx, cy]) => `<circle cx="${cx}" cy="${cy}" r="2.7" fill="#5a2d6b" /><circle cx="${cx - 0.8}" cy="${cy - 0.8}" r="0.7" fill="#fff" fill-opacity=".5" />`
+      ).join("")}
+      <ellipse cx="14" cy="11" rx="3" ry="5" fill="#fff" fill-opacity=".18" transform="rotate(35 14 11)" />
+    </svg>`,
+  iconSize: [44, 56],
+  iconAnchor: [22, 53],
+  popupAnchor: [0, -50],
 });
 
 const VERIFICATION_ANSWER = "557";
@@ -190,7 +216,7 @@ const ContactData: React.FC = () => {
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <Marker position={CONTACT.mapPosition} icon={markerIcon} alt={formatMessage({ id: "carousel.text1" })}>
+                <Marker position={CONTACT.mapPosition} icon={markerIcon} title={formatMessage({ id: "carousel.text1" })}>
                   <Popup>
                     <strong>{formatMessage({ id: "carousel.text1" })}</strong>
                     <br />
