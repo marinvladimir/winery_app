@@ -1,31 +1,12 @@
 import React from "react";
-import styled from "styled-components";
+import { useIntl } from "react-intl";
 import TourContent from "../components/TourContent";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 const TourPage: React.FC = () => {
-  return (
-    <PageWrapper>
-      <ContentWrapper>
-        <TourContent />
-      </ContentWrapper>
-    </PageWrapper>
-  );
+  const { formatMessage } = useIntl();
+  useDocumentTitle(formatMessage({ id: "header.link2" }));
+  return <TourContent />;
 };
 
 export default TourPage;
-
-const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-`;
-
-const ContentWrapper = styled.main`
-  flex: 1;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow-x: hidden;
-`;

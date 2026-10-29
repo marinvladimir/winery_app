@@ -1,41 +1,44 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IntlProvider } from "react-intl";
 import en from "../locales/en.json";
 import hr from "../locales/hr.json";
+import { isLocale, LanguageContext, Locale } from "./languageContext";
 
 const messages = { en, hr };
+const STORAGE_KEY = "locale";
+const DEFAULT_LOCALE: Locale = "hr";
 
-type Locale = "en" | "hr";
-
-interface LanguageContextType {
-  locale: Locale;
-  switchLanguage: (lang: Locale) => void;
-}
-
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+// localStorage can throw (private mode, blocked storage) or hold a stale value.
+const readStoredLocale = (): Locale => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return isLocale(stored) ? stored : DEFAULT_LOCALE;
+  } catch {
+    return DEFAULT_LOCALE;
+  }
+};
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const storedLocale = localStorage.getItem("locale") as Locale || "hr"; 
-  const [locale, setLocale] = useState<Locale>(storedLocale);
+  const [locale, setLocale] = useState<Locale>(readStoredLocale);
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   const switchLanguage = (lang: Locale) => {
     setLocale(lang);
-    localStorage.setItem("locale", lang);
+    try {
+      localStorage.setItem(STORAGE_KEY, lang);
+    } catch {
+      // Ignore – the choice still applies for this visit.
+    }
   };
 
   return (
     <LanguageContext.Provider value={{ locale, switchLanguage }}>
-      <IntlProvider locale={locale} messages={messages[locale]}>
+      <IntlProvider locale={locale} defaultLocale={DEFAULT_LOCALE} messages={messages[locale]}>
         {children}
       </IntlProvider>
     </LanguageContext.Provider>
   );
-};
-
-export const useLanguage = () => {
-  const context = useContext(LanguageContext);
-  if (!context) {
-    throw new Error("useLanguage must be used within a LanguageProvider");
-  }
-  return context;
 };

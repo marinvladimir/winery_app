@@ -1,415 +1,411 @@
-import React, { useEffect, useRef } from "react";
+import React, { lazy } from "react";
 import { useIntl } from "react-intl";
-import Slider from "react-slick";
-import styled, { keyframes } from "styled-components";
-import BarrelScene from "./Barrel";
+import Slider, { Settings } from "react-slick";
+import styled from "styled-components";
+import { CONTACT } from "../data/contact";
+import { TOUR_PHOTOS } from "../data/photos";
+import { usePrefersReducedMotion } from "../hooks/useMediaQuery";
+import DeferredScene from "./DeferredScene";
+import PageHero from "./PageHero";
+import { ClockIcon, GlobeIcon, MailIcon, PhoneIcon, TagIcon, UserIcon, UsersIcon } from "./Icons";
+import {
+  buttonOutline,
+  buttonPrimary,
+  Container,
+  Divider,
+  Eyebrow,
+  Section,
+  SectionHeader,
+  SectionTitle,
+} from "./ui";
+
+const BarrelScene = lazy(() => import("./Barrel"));
+
+const STEPS = [
+  { headingId: "tour.heading1", textId: "tour.para1" },
+  { headingId: "tour.heading2", textId: "tour.para2" },
+  { headingId: "tour.heading3", textId: "tour.para3" },
+];
+
+const DETAILS = [
+  { icon: UserIcon, labelId: "tour.details1", valueId: "tour.details2" },
+  { icon: ClockIcon, labelId: "tour.details3", valueId: "tour.details4" },
+  { icon: TagIcon, labelId: "tour.details11", valueId: "tour.details12" },
+  { icon: UsersIcon, labelId: "tour.details13", valueId: "tour.details14" },
+];
 
 const TourContent: React.FC = () => {
   const { formatMessage } = useIntl();
-  const settings = {
-    dots: false,
+  const reducedMotion = usePrefersReducedMotion();
+
+  const sliderSettings: Settings = {
+    dots: true,
+    arrows: false,
     infinite: true,
     speed: 600,
     slidesToShow: 1,
     slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 4000,
-    arrows: false,
-    adaptiveHeight: false,
+    autoplay: !reducedMotion,
+    autoplaySpeed: 4500,
+    pauseOnHover: true,
+    pauseOnFocus: true,
+    pauseOnDotsHover: true,
     beforeChange: () => {
-      document.activeElement instanceof HTMLElement && document.activeElement.blur();
+      // Slick hides inactive slides with aria-hidden; drop focus only if it sits on one.
+      const active = document.activeElement;
+      if (active instanceof HTMLElement && active.closest(".slick-slide")) active.blur();
     },
+    customPaging: (i: number) => (
+      <button type="button" aria-label={formatMessage({ id: "tour.slide" }, { n: i + 1, total: TOUR_PHOTOS.length })}>
+        {i + 1}
+      </button>
+    ),
   };
-
-
-  const sliderRef = useRef<Slider>(null);
-
-  useEffect(() => {
-    const handleSlideChange = () => {
-      const slides = document.querySelectorAll(".slick-slide[aria-hidden='true']");
-      slides.forEach(slide => {
-        slide.querySelectorAll("a, button, input, select, textarea").forEach(el => el.setAttribute("tabindex", "-1"));
-      });
-    };
-
-    handleSlideChange();
-    sliderRef.current?.slickGoTo(0);
-    return () => window.removeEventListener("load", handleSlideChange);
-  }, []);
-
-  useEffect(() => {
-    const updateSlidesAccessibility = () => {
-      const allSlides = document.querySelectorAll(".slick-slide");
-
-      allSlides.forEach(slide => {
-        const isHidden = slide.getAttribute("aria-hidden") === "true";
-
-        if (isHidden) {
-          slide.setAttribute("inert", "");
-          slide.querySelectorAll("a, button, input, select, textarea").forEach(el => el.setAttribute("tabindex", "-1"));
-        } else {
-          slide.removeAttribute("inert");
-          slide.querySelectorAll("a, button, input, select, textarea").forEach(el => el.removeAttribute("tabindex"));
-        }
-      });
-    };
-
-    const observer = new MutationObserver(updateSlidesAccessibility);
-    observer.observe(document.body, { subtree: true, attributes: true, attributeFilter: ["aria-hidden"] });
-
-    updateSlidesAccessibility();
-
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <>
+      <PageHero
+        image="assets/w4.jpeg"
+        position="center 40%"
+        eyebrow={formatMessage({ id: "tour.eyebrow" })}
+        title={formatMessage({ id: "tour.start" })}
+        subtitle={formatMessage({ id: "tour.subtitle" })}
+      />
 
-      <HeroSection>
-        <HeroText>{formatMessage({ id: "tour.start" })}</HeroText>
-      </HeroSection>
-      <SliderContainer>
-        <StyledSlider ref={sliderRef} {...settings}>
-          {Array.from({ length: 9 }, (_, i) => (
-            <Slide key={i} $isActive={i === 0}>
-              <img src={`assets/w${i + 1}.jpeg`} alt={`Gallery ${i + 1}`} />
-            </Slide>
-          ))}
-        </StyledSlider>
-      </SliderContainer>
-      <div style={{marginBottom: "16px"}}>
-      <BarrelScene />
-      </div><TourWrapper>
-        <Separator />
-        <Section>
-          <h3>{formatMessage({ id: "tour.heading1" })}</h3>
-          <p>{formatMessage({ id: "tour.para1" })}</p>
-        </Section>
-        <Separator />
-        <Section>
-          <h3>{formatMessage({ id: "tour.heading2" })}</h3>
-          <p>{formatMessage({ id: "tour.para2" })}</p>
-        </Section>
-        <Separator />
-        <Section>
-          <h3>{formatMessage({ id: "tour.heading3" })}</h3>
-          <p>{formatMessage({ id: "tour.para3" })}</p>
-        </Section>
-        <Details>
-          <DetailsContent>
-            <h3>{formatMessage({ id: "tour.label" })}</h3>
+      <Section aria-labelledby="tour-program-title">
+        <Container $narrow>
+          <SliderFrame aria-roledescription="carousel" aria-label={formatMessage({ id: "tour.photos" })}>
+            <Slider {...sliderSettings}>
+              {TOUR_PHOTOS.map((photo) => (
+                <Slide key={photo.src}>
+                  <img
+                    src={photo.src}
+                    alt={formatMessage({ id: photo.altId })}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </Slide>
+              ))}
+            </Slider>
+          </SliderFrame>
+
+          <DeferredScene width={280} height={260}>
+            <BarrelScene />
+          </DeferredScene>
+
+          <SectionHeader>
+            <Eyebrow>{formatMessage({ id: "tour.program.eyebrow" })}</Eyebrow>
+            <SectionTitle id="tour-program-title">{formatMessage({ id: "tour.program.title" })}</SectionTitle>
+            <Divider />
+          </SectionHeader>
+
+          <Steps>
+            {STEPS.map((step, index) => (
+              <Step key={step.headingId}>
+                <StepNumber aria-hidden="true">{index + 1}</StepNumber>
+                <div>
+                  <h3>{formatMessage({ id: step.headingId })}</h3>
+                  <p>{formatMessage({ id: step.textId })}</p>
+                </div>
+              </Step>
+            ))}
+          </Steps>
+        </Container>
+      </Section>
+
+      <Section $tone="cream" aria-labelledby="tour-info-title">
+        <Container $narrow>
+          <DetailsCard>
+            <h2 id="tour-info-title">{formatMessage({ id: "tour.label" })}</h2>
+            <DetailsList>
+              {DETAILS.map(({ icon: Icon, labelId, valueId }) => (
+                <div key={labelId}>
+                  <DetailIcon>
+                    <Icon size={22} />
+                  </DetailIcon>
+                  <dt>{formatMessage({ id: labelId })}</dt>
+                  <dd>{formatMessage({ id: valueId })}</dd>
+                </div>
+              ))}
+            </DetailsList>
+          </DetailsCard>
+
+          <ClosingText>{formatMessage({ id: "tour.end" })}</ClosingText>
+
+          <VisitCard>
+            <img src="assets/logo.png" alt="" width={72} height={72} loading="lazy" />
+            <h2>{formatMessage({ id: "tour.info" })}</h2>
             <p>
-              <strong>{formatMessage({ id: "tour.details1" })}</strong> {formatMessage({ id: "tour.details2" })}
+              {CONTACT.street}, {CONTACT.city}
+              <br />
+              {formatMessage({ id: "tour.info2" })}
             </p>
-            <p>
-              <strong>{formatMessage({ id: "tour.details3" })}</strong>{formatMessage({ id: "tour.details4" })}
-            </p>
-            <p>
-              <strong>{formatMessage({ id: "tour.details11" })}</strong>{formatMessage({ id: "tour.details12" })}
-            </p>
-            <p>
-              <strong>{formatMessage({ id: "tour.details13" })}</strong>{formatMessage({ id: "tour.details14" })}
-            </p>
-          </DetailsContent>
-          <PriceTag>{formatMessage({ id: "tour.details15" })}</PriceTag>
-        </Details>
-        <ClosingText>{formatMessage({ id: "tour.end" })}</ClosingText>
-        <VisitCard>
-          <h2>{formatMessage({ id: "tour.info" })}</h2>
-          <p>Ulica Marina Studina 59, Kaštel Novi</p>
-          <a href="mailto:vinarija.kuzmanic@gmail.com">📧 vinarija.kuzmanic@gmail.com</a>
-          <p>{formatMessage({ id: "tour.info2" })}</p>
-          <a href="tel:+385989932710">📞 +385 (0)98 993 2710</a>
-          <a href="https://vinarijakuzmanic.com/" target="_blank" rel="noopener noreferrer">
-            🌍 vinarijakuzmanic.com
-          </a>
-        </VisitCard>
-      </TourWrapper>      </>
+            <VisitActions>
+              <PrimaryAnchor href={CONTACT.phoneHref}>
+                <PhoneIcon size={18} />
+                {CONTACT.phoneDisplay}
+              </PrimaryAnchor>
+              <OutlineAnchor href={`mailto:${CONTACT.email}`}>
+                <MailIcon size={18} />
+                {formatMessage({ id: "tour.email" })}
+              </OutlineAnchor>
+            </VisitActions>
+            <WebsiteLink href={CONTACT.website} target="_blank" rel="noopener noreferrer">
+              <GlobeIcon size={16} />
+              {CONTACT.websiteDisplay}
+            </WebsiteLink>
+          </VisitCard>
+        </Container>
+      </Section>
+    </>
   );
 };
 
 export default TourContent;
 
-const fadeIn = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+const SliderFrame = styled.div`
+  margin-bottom: 1rem;
+
+  .slick-slide > div {
+    line-height: 0;
   }
 `;
 
-export const HeroSection = styled.div`
-  position: relative;
-  width: 100%;
-  min-height: 100vh;
-  background-image: url("/assets/f3.jpg");
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  filter: brightness(0.75);
-  transition: transform 0.5s ease-in-out, filter 0.5s ease-in-out;
-  animation: ${fadeIn} 1s ease-out;
-
-  &:hover {
-    filter: brightness(1.1);
-    transform: scale(1.05);
-
-    @media (max-width: 768px) {
- transform: scale(1.1);
-  }
-  }
-
-  @media (max-width: 768px) {
-    min-height: 50vh;
-    background-position: top;
-  }
-`;
-
-export const HeroText = styled.h1`
-  font-size: 38px;
-  color: white;
-  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
-  font-family: 'Georgia', sans-serif;
-  padding: 20px;
-  text-align: center;
-
-  @media (max-width: 768px) {
-    font-size: 22px;
-  }
-`;
-
-const StyledSlider = styled(Slider)`
-  .slick-prev,
-  .slick-next {
-    display: none !important;
-  }
-`;
-
-const SliderContainer = styled.div`
-  width: 90%;
-  max-width: 800px;
-  margin: 32px auto;
-  margin-bottom: 0;
-
-  @media (max-width: 768px) {
-    width: 95%;
-  }
-`;
-
-const Slide = styled.div<{ $isActive: boolean }>`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  width: 100%;
-  height: 500px; /* Default height */
-  pointer-events: ${({ $isActive }) => ($isActive ? "auto" : "none")};
-  tabindex: ${({ $isActive }) => ($isActive ? "0" : "-1")};
-  ${({ $isActive }) => !$isActive && "inert: true;"}
-
+const Slide = styled.div`
   img {
     width: 100%;
-    height: 100%;
+    aspect-ratio: 16 / 10;
     object-fit: cover;
-    position: relative;
-    z-index: 2;
+    border-radius: var(--radius);
+  }
+`;
+
+const Steps = styled.ol`
+  position: relative;
+  display: grid;
+  gap: 2.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 23px;
+    width: 1px;
+    background: var(--line);
+  }
+`;
+
+const Step = styled.li`
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 1.5rem;
+
+  h3 {
+    margin: 0.5rem 0 0.75rem;
+    font-size: 1.5rem;
+    color: var(--wine-700);
   }
 
-  @media (max-width: 768px) {
-    height: 350px; /* Smaller height for mobile */
+  p {
+    margin: 0;
   }
 
   @media (max-width: 480px) {
-    height: 250px;
+    gap: 1rem;
   }
 `;
 
-
-
-const VisitCard = styled.div`
-  background: url(/assets/visit.png) no-repeat center, #f5e8d9;
-  // border: 2px solid #5a1f1f;
-  opacity: 0.8;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  max-width: 400px;
-  margin: 40px auto 0;
-    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
-  transform: rotate(-2deg);
-  font-family: "Georgia", serif;
-  margin-bottom: 32px;
-
-  h2 {
-    font-size: 22px;
-    color: #5a1f1f;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-    margin-bottom: 10px;
-
-  @media (max-width: 768px) {
-    font-size: 18px !important;
-  }
-  }
-
-  p {
-    font-size: 18px;
-    color: #333;
-    margin: 5px 0;
-
-      @media (max-width: 768px) {
-    font-size: 14px !important;
-  }
-  }
-
-  a {
-    display: block;
-   font-size: 18px;
-    color: #5a1f1f;
-    font-weight: bold;
-    text-decoration: none;
-    margin-top: 5px;
-
-      @media (max-width: 768px) {
-    font-size: 14px !important;
-  }
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-`;
-
-// const Header = styled.h2`
-//   background-image: url(/assets/wooden.jpg);
-//   background-size: cover;
-//   background-position: center;
-//   color: #f5e8d9;
-//   margin: 0;
-//   margin-top: 16px;
-//   padding: 23px;
-//   text-align: center;
-//   font-family: "Playfair Display", serif;
-//   box-shadow: inset 0px -5px 8px rgba(0, 0, 0, 0.3);
-// `
-
-export const Separator = styled.div`
-  width: 100px;
-  height: 3px;
-  background: #8a2c2c;
-  margin: 10px auto;
-  border-radius: 2px;
-`;
-
-const TourWrapper = styled.div`
-  max-width: 800px;
-  text-align: center;
-  padding:  0 40px;
-  line-height: 1.6;
-  @media (max-width: 768px) {
-    padding: 0;
-  }
-`;
-
-export const Section = styled.div`
-  margin-bottom: 20px;
-
-  h3 {
-    font-size: 22px;
-    color: #8a2c2c;
-    font-family: "Georgia", serif;
-  }
-
-  p {
-    font-size: 18px;
-    color: #333;
-    font-family: "Merriweather", serif;
-  }
-`;
-
-const Details = styled.div`
+const StepNumber = styled.span`
   position: relative;
-  background: linear-gradient(rgb(255 255 255 / 70%), rgba(0, 0, 0, 0.5)), url(/assets/wn2.png);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  padding: 40px;
-  border-radius: 12px;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
-  border: 3px solid #8a2c2c;
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
-  max-width: 600px;
-  margin: 0 auto;
-
-  @media (max-width: 768px) {
-    padding: 20px;
-  }
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--wine-700);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  box-shadow: 0 0 0 6px var(--white);
 `;
 
-const DetailsContent = styled.div`
-  background: rgb(255 255 255 / 79%);
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  max-width: 500px;
+const DetailsCard = styled.div`
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.75rem, 4vw, 3rem);
+  border-radius: var(--radius);
+  background: var(--white);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
 
-  h3 {
-    font-size: 24px;
-    color: #6e1b1b;
-    font-family: "Georgia", serif;
-    border-bottom: 2px solid #6e1b1b;
-    padding-bottom: 5px;
-    margin-bottom: 10px;
-  }
-
-  p {
-    font-size: 18px;
-    font-weight: 500;
-    color: #442222;
-    font-family: "Merriweather", serif;
-  }
-`;
-
-const PriceTag = styled.div`
-  position: absolute;
-  bottom: -15px;
-  right: 20px;
-  background: #8a2c2c;
-  color: #fff;
-  font-size: 18px;
-  font-weight: bold;
-  padding: 10px 20px;
-  border-radius: 5px;
-  transform: rotate(-10deg);
-  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
-  font-family: "Georgia", serif;
-
-  &:before {
+  &::after {
     content: "";
     position: absolute;
-    top: 50%;
-    left: -10px;
-    width: 15px;
-    height: 15px;
-    background: #fff;
-    border-radius: 50%;
-    transform: translateY(-50%);
+    top: -24px;
+    right: -24px;
+    width: 150px;
+    height: 150px;
+    background: url("assets/wn2.png") no-repeat center / contain;
+    opacity: 0.22;
+    pointer-events: none;
+
+    @media (max-width: 640px) {
+      display: none;
+    }
   }
+
+  h2 {
+    position: relative;
+    font-size: clamp(1.625rem, 3vw, 2rem);
+    margin-bottom: 2rem;
+  }
+`;
+
+const DetailsList = styled.dl`
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.75rem 2rem;
+  margin: 0;
+
+  > div {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    grid-template-rows: auto 1fr;
+    column-gap: 1rem;
+    align-items: start;
+  }
+
+  dt {
+    grid-column: 2;
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--wine-600);
+  }
+
+  dd {
+    grid-column: 2;
+    margin: 0.25rem 0 0;
+    color: var(--ink);
+    line-height: 1.55;
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const DetailIcon = styled.span`
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--cream);
+  color: var(--wine-700);
 `;
 
 const ClosingText = styled.p`
-  margin-top: 30px;
-  font-size: 18px;
-  font-weight: 600;
-  color: #8a2c2c;
-  font-family: "Georgia", serif;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  max-width: 640px;
+  margin: clamp(3rem, 6vw, 4.5rem) auto;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.5vw, 1.625rem);
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--wine-900);
+
+  &::before,
+  &::after {
+    color: var(--gold);
+  }
+
+  &::before {
+    content: "“";
+  }
+
+  &::after {
+    content: "”";
+  }
 `;
 
+const VisitCard = styled.div`
+  max-width: 520px;
+  margin: 0 auto;
+  padding: clamp(2rem, 4vw, 2.75rem);
+  border-radius: var(--radius);
+  background: var(--wine-900);
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+
+  img {
+    margin: 0 auto 1.25rem;
+    border-radius: 8px;
+  }
+
+  h2 {
+    font-size: 1.625rem;
+    color: var(--white);
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.8);
+  }
+`;
+
+const VisitActions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 1.5rem 0 1.25rem;
+`;
+
+const PrimaryAnchor = styled.a`
+  ${buttonPrimary};
+  background: var(--gold-light);
+  color: var(--wine-950);
+
+  &:hover {
+    background: var(--white);
+    color: var(--wine-950);
+  }
+`;
+
+const OutlineAnchor = styled.a`
+  ${buttonOutline};
+  border-color: rgba(255, 255, 255, 0.6);
+  color: var(--white);
+
+  &:hover {
+    background: var(--white);
+    color: var(--wine-900);
+  }
+`;
+
+const WebsiteLink = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  color: var(--gold-light);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--white);
+    text-decoration: underline;
+  }
+`;

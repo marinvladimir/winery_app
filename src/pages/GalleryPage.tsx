@@ -1,259 +1,326 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
-import { HeroSection, HeroText } from "../components/TourContent";
 import { useIntl } from "react-intl";
-
-const images = [
-  "assets/fb.jpg",
-  "assets/4.jpg",
-  "assets/w9.jpeg",
-  "assets/w8.jpeg"
-];
+import PageHero from "../components/PageHero";
+import { ChevronLeftIcon, ChevronRightIcon, CloseIcon, ExpandIcon } from "../components/Icons";
+import { Container, Section } from "../components/ui";
+import { GALLERY_PHOTOS } from "../data/photos";
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
 
 const GalleryPage: React.FC = () => {
   const { formatMessage } = useIntl();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [zoomedImageIndex, setZoomedImageIndex] = useState<number | null>(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const triggerRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  useDocumentTitle(formatMessage({ id: "header.link3" }));
 
-  const nextImage = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-  };
-
-  const prevImage = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
-  };
-
-  const openZoomedImage = (index: number) => {
-    if (!isMobile) setZoomedImageIndex(index);
-  };
-
-  const closeZoomedImage = () => {
-    setZoomedImageIndex(null);
-  };
+  const close = useCallback(() => {
+    if (openIndex !== null) triggerRefs.current[openIndex]?.focus();
+    setOpenIndex(null);
+  }, [openIndex]);
 
   return (
-    <PageWrapper>
-      <HeroSection>
-        <HeroText>{formatMessage({ id: "gallery.heading" })}</HeroText>
-      </HeroSection>
-      <GalleryTitle>{formatMessage({ id: "gallery.subheading" })}</GalleryTitle>
-      <GalleryContainer>
-        {!isMobile ? (
-          <DesktopGallery>
-            <ArrowButton onClick={prevImage} $left>
-              ⮜
-            </ArrowButton>
-            <ImageWrapper>
-              {images.map((image, index) => {
-                const offset = (index - currentIndex + images.length) % images.length;
-                return (
-                  <StyledImage
-                  key={index}
-                  src={image}
-                  $cursor={index === currentIndex}
-                  alt={`Gallery image ${index + 1}`}
-                  style={{
-                    transform: `translateX(${offset * 120}px) scale(${index === currentIndex ? 1 : 0.85})`,
-                    zIndex: index === currentIndex ? 2 : 1
-                  }}
-                  onClick={() => index === currentIndex && openZoomedImage(index)}
-                />
-                );
-              })}
-            </ImageWrapper>
-            <ArrowButton onClick={nextImage}>⮞</ArrowButton>
-          </DesktopGallery>
-        ) : (
-          <MobileGallery>
-            {images.map((image, index) => (
-              <MobileImage key={index} src={image} alt={`Image ${index + 1}`} />
-            ))}
-          </MobileGallery>
-        )}
-      </GalleryContainer>
-      {zoomedImageIndex !== null && (
-        <ModalOverlay onClick={closeZoomedImage}>
-          <ModalContent>
-            <img
-              src={images[zoomedImageIndex]}
-              alt={`Zoomed-in image ${zoomedImageIndex + 1}`}
-              style={{ maxWidth: "100%", maxHeight: "100%" }}
-            />
-            <CloseButton onClick={closeZoomedImage}>✖</CloseButton>
-          </ModalContent>
-        </ModalOverlay>
+    <>
+      <PageHero
+        image="assets/1-1.jpg"
+        size="medium"
+        eyebrow={formatMessage({ id: "gallery.eyebrow" })}
+        title={formatMessage({ id: "gallery.heading" })}
+        subtitle={formatMessage({ id: "gallery.subheading" })}
+      />
+
+      <Section aria-label={formatMessage({ id: "gallery.heading" })}>
+        <Container>
+          <Grid>
+            {GALLERY_PHOTOS.map((photo, index) => {
+              const alt = formatMessage({ id: photo.altId });
+              return (
+                <li key={photo.src}>
+                  <Thumb
+                    ref={(el) => {
+                      triggerRefs.current[index] = el;
+                    }}
+                    type="button"
+                    onClick={() => setOpenIndex(index)}
+                    aria-label={formatMessage({ id: "gallery.open" }, { alt })}
+                  >
+                    <img src={photo.src} alt="" loading="lazy" decoding="async" />
+                    <ThumbOverlay aria-hidden="true">
+                      <ExpandIcon size={22} />
+                    </ThumbOverlay>
+                  </Thumb>
+                </li>
+              );
+            })}
+          </Grid>
+        </Container>
+      </Section>
+
+      {openIndex !== null && (
+        <Lightbox index={openIndex} onChange={setOpenIndex} onClose={close} />
       )}
-    </PageWrapper>
+    </>
   );
 };
 
 export default GalleryPage;
 
+interface LightboxProps {
+  index: number;
+  onChange: (index: number) => void;
+  onClose: () => void;
+}
+
+const Lightbox: React.FC<LightboxProps> = ({ index, onChange, onClose }) => {
+  const { formatMessage } = useIntl();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const touchStartX = useRef<number | null>(null);
+  const count = GALLERY_PHOTOS.length;
+  const photo = GALLERY_PHOTOS[index];
+  const alt = formatMessage({ id: photo.altId });
+
+  const prev = useCallback(() => onChange((index - 1 + count) % count), [index, count, onChange]);
+  const next = useCallback(() => onChange((index + 1) % count), [index, count, onChange]);
+
+  useEffect(() => {
+    closeRef.current?.focus();
+    const { overflow } = document.body.style;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = overflow;
+    };
+  }, []);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      else if (e.key === "ArrowLeft") prev();
+      else if (e.key === "ArrowRight") next();
+      else if (e.key === "Tab" && dialogRef.current) {
+        // Keep keyboard focus inside the dialog.
+        const focusable = dialogRef.current.querySelectorAll<HTMLElement>("button");
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [onClose, prev, next]);
+
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(dx) > 50) (dx > 0 ? prev : next)();
+    touchStartX.current = null;
+  };
+
+  return (
+    <Overlay
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label={formatMessage({ id: "gallery.heading" })}
+      onClick={onClose}
+      onTouchStart={(e) => (touchStartX.current = e.touches[0].clientX)}
+      onTouchEnd={onTouchEnd}
+    >
+      <CloseButton ref={closeRef} type="button" onClick={onClose} aria-label={formatMessage({ id: "gallery.close" })}>
+        <CloseIcon size={26} />
+      </CloseButton>
+
+      <NavButton
+        type="button"
+        $side="left"
+        onClick={(e) => {
+          e.stopPropagation();
+          prev();
+        }}
+        aria-label={formatMessage({ id: "gallery.prev" })}
+      >
+        <ChevronLeftIcon size={28} />
+      </NavButton>
+
+      <Figure onClick={(e) => e.stopPropagation()}>
+        <img key={photo.src} src={photo.src} alt={alt} />
+        <figcaption>
+          <span>{alt}</span>
+          <span aria-live="polite">
+            {index + 1} / {count}
+          </span>
+        </figcaption>
+      </Figure>
+
+      <NavButton
+        type="button"
+        $side="right"
+        onClick={(e) => {
+          e.stopPropagation();
+          next();
+        }}
+        aria-label={formatMessage({ id: "gallery.next" })}
+      >
+        <ChevronRightIcon size={28} />
+      </NavButton>
+    </Overlay>
+  );
+};
+
 const fadeIn = keyframes`
-  from { opacity: 0; transform: scale(0.8); }
+  from { opacity: 0; }
+  to { opacity: 1; }
+`;
+
+const zoomIn = keyframes`
+  from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: scale(1); }
 `;
 
+const Grid = styled.ul`
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 
-const StyledImage = styled.img<{ $cursor?: boolean }>`
-  position: absolute;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  position: absolute;
-  transition: 
-  transform 0.5s ease-out, 
-  opacity 0.5s ease-out, 
-  filter 0.5s ease-out, 
-  box-shadow 0.5s ease-out;
-    
-  max-width: 100%;
-  max-height: 100%;
-  ${({ $cursor }) => ($cursor ? "cursor: pointer;" : "")}
-  object-fit: cover;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.25);
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 
-  &:hover {
-    // transform: scale(1.1);
-    ${({ $cursor }) => ($cursor ? "scale(1.1);" : "")}
-    //  filter: brightness(1.05) contrast(1.1) saturate(1.15) drop-shadow(0 0 6px rgba(150, 50, 75, 0.3));
-    ${({ $cursor }) => ($cursor ? "filter: brightness(1.05) contrast(1.1) saturate(1.15) drop-shadow(0 0 6px rgba(150, 50, 75, 0.3));" : "")}
-    //  border: 1px solid rgba(123, 30, 37, 0.3);
-    ${({ $cursor }) => ($cursor ? "border: 1px solid rgba(123, 30, 37, 0.3);" : "")}
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
   }
 `;
 
-const PageWrapper = styled.div`
+const ThumbOverlay = styled.span`
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(36, 8, 12, 0.45);
+  color: var(--white);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+`;
+
+const Thumb = styled.button`
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--cream-200);
+  cursor: zoom-in;
+  box-shadow: var(--shadow-sm);
+
+  img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  &:hover img,
+  &:focus-visible img {
+    transform: scale(1.05);
+  }
+
+  &:hover ${ThumbOverlay}, &:focus-visible ${ThumbOverlay} {
+    opacity: 1;
+  }
+`;
+
+const Overlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 72px 24px;
+  background: rgba(16, 6, 8, 0.94);
+  animation: ${fadeIn} 0.25s ease-out;
+
+  @media (max-width: 640px) {
+    padding: 64px 12px 80px;
+  }
+`;
+
+const Figure = styled.figure`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  min-height: 100vh;
-  padding-bottom: 50px;
-  background: white;
-`;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
 
-const GalleryTitle = styled.h2`
-  margin-top: 20px;
-  font-size: 28px;
-  font-weight: bold;
-  text-align: center;
-  color: rgb(123, 30, 37);
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-`;
+  img {
+    max-width: 100%;
+    max-height: calc(100svh - 160px);
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+    animation: ${zoomIn} 0.3s ease-out;
+  }
 
-const GalleryContainer = styled.div`
-  width: 90%;
-  max-width: 700px;
-  margin-top: 20px;
-  border-radius: 12px;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(10px);
-  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
-`;
-
-const DesktopGallery = styled.div`
-  display: flex;
-  align-items: center;
-  position: relative;
-  width: 100%;
-  height: 400px;
-  @media (max-width: 768px) {
-    display: none;
+  figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    width: 100%;
+    margin-top: 0.875rem;
+    font-family: var(--font-ui);
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.8);
   }
 `;
 
-const MobileGallery = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-`;
-
-const MobileImage = styled.img`
-  width: 100%;
-  max-width: 300px;
-  border-radius: 12px;
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
-`;
-
-const ImageWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-`;
-
-const ArrowButton = styled.button<{ $left?: boolean }>`
-  position: absolute;
-  ${({ $left }) => ($left ? "left: -60px;" : "right: -60px;")}
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(123, 30, 37, 0.9);
-  color: white;
+const iconButton = `
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  width: 55px;
-  height: 55px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  font-size: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+  transition: background 0.2s ease;
+
   &:hover {
-    background: rgb(160, 40, 45);
-    transform: translateY(-50%) scale(1.1);
+    background: rgba(255, 255, 255, 0.2);
   }
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: ${fadeIn} 0.3s ease-in-out;
-  z-index: 999;
-`;
-
-const ModalContent = styled.div`
-  position: relative;
-  max-width: 90%;
-  max-height: 90%;
-  border-radius: 10px;
-  overflow: hidden;
 `;
 
 const CloseButton = styled.button`
+  ${iconButton};
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(255, 0, 0, 0.7);
-  color: white;
-  border: none;
-  font-size: 20px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  &:hover {
-    background: rgba(255, 0, 0, 1);
+  top: 12px;
+  right: 12px;
+`;
+
+const NavButton = styled.button<{ $side: "left" | "right" }>`
+  ${iconButton};
+  position: absolute;
+  top: 50%;
+  ${({ $side }) => $side}: 12px;
+  transform: translateY(-50%);
+  z-index: 1;
+
+  @media (max-width: 640px) {
+    top: auto;
+    bottom: 12px;
+    transform: none;
+    width: 44px;
+    height: 44px;
   }
 `;

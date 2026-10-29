@@ -1,388 +1,402 @@
-import { FormattedMessage, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
 import styled from "styled-components";
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 import emailjs from "emailjs-com";
 import { toast } from "react-toastify";
-import { getVisitorCount, incrementVisitorCount } from "../utils/redisClient";
+import { getVisitorCount, incrementVisitorCount, isVisitorCounterEnabled } from "../utils/redisClient";
 import { EMAIL_SERVICE_PUBLIC_KEY, EMAIL_SERVICE_SERVICE_ID, EMAIL_SERVICE_TEMPLATE_ID } from "../config";
+import { CONTACT } from "../data/contact";
+import { MailIcon, MapPinIcon, PhoneIcon, UserIcon } from "./Icons";
+import { buttonPrimary, Container, Divider, Eyebrow, Section, SectionHeader, SectionTitle } from "./ui";
 
-const customIcon = new L.Icon({
-    iconUrl: "/leaflet/marker.png",
-    iconSize: [41, 41],
-    iconAnchor: [21, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
+const markerIcon = new L.Icon({
+  iconUrl: "leaflet/marker.png",
+  iconSize: [41, 41],
+  iconAnchor: [21, 41],
+  popupAnchor: [0, -36],
 });
 
-interface ButtonProps {
-    $isDisabled: boolean;
-}
-
-export const LanguageButton = styled.button`
-  background: none;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  color: #0073e6;
-  transition: color 0.3s;
-  
-  &:hover {
-    color: #005bb5;
-  }
-`;
+const VERIFICATION_ANSWER = "557";
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface FormData {
-    from_name: string;
-    reply_to: string;
-    verification: string;
-    message: string;
+  from_name: string;
+  reply_to: string;
+  verification: string;
+  message: string;
 }
 
+type FieldName = keyof FormData;
+
+const EMPTY_FORM: FormData = { from_name: "", reply_to: "", verification: "", message: "" };
+const FIELD_ORDER: FieldName[] = ["from_name", "reply_to", "message", "verification"];
+
 const ContactData: React.FC = () => {
-    const { formatMessage } = useIntl();
-    const [visitorCount, setVisitorCount] = useState<number>(0);
+  const { formatMessage } = useIntl();
+  const [visitorCount, setVisitorCount] = useState<number | null>(null);
+  const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
+  const [errors, setErrors] = useState<Partial<Record<FieldName, string>>>({});
+  const [loading, setLoading] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
-    useEffect(() => {
-        async function fetchAndIncrement() {
-            const count = await getVisitorCount();
-            setVisitorCount(count);
-            if (!sessionStorage.getItem("visited")) {
-                const newCount = await incrementVisitorCount();
-                setVisitorCount(newCount);
-                sessionStorage.setItem("visited", "true");
-            }
-        }
-        fetchAndIncrement();
-    }, []);
+  useEffect(() => {
+    if (!isVisitorCounterEnabled) return;
+    let cancelled = false;
 
-    const [formData, setFormData] = useState<FormData>({
-        from_name: "",
-        reply_to: "",
-        verification: "",
-        message: "",
-    });
-    const [errors, setErrors] = useState<Partial<FormData>>({});
-    const [loading, setLoading] = useState<boolean>(false);
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const validateForm = (): boolean => {
-        let newErrors: Partial<FormData> = {};
-
-        if (!formData.from_name.trim()) newErrors.from_name = formatMessage({ id: "contact.name.error" })
-        if (!formData.reply_to.trim()) newErrors.reply_to = formatMessage({ id: "contact.email.error" })
-        if (formData.verification !== "557") newErrors.verification = formatMessage({ id: "contact.verification.error" })
-        if (!formData.message.trim()) newErrors.message = formatMessage({ id: "contact.message.error" })
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (!validateForm()) return;
-
-        setLoading(true);
+    const loadCount = async () => {
+      try {
+        let firstVisit = false;
         try {
-            await emailjs.send(
-                EMAIL_SERVICE_SERVICE_ID,
-                EMAIL_SERVICE_TEMPLATE_ID,
-                { ...formData } as Record<string, unknown>,
-                EMAIL_SERVICE_PUBLIC_KEY
-            );
-            toast.success("Poruka uspješno poslana!");
-            setFormData({ from_name: "", reply_to: "", verification: "", message: "" });
-        } catch (error) {
-            toast.error("Došlo je do greške. Pokušajte ponovo.");
-        } finally {
-            setLoading(false);
+          firstVisit = !sessionStorage.getItem("visited");
+          // Mark before the request so a re-run of this effect can't count twice.
+          sessionStorage.setItem("visited", "true");
+        } catch {
+          // Storage unavailable – just show the count.
         }
+        const count = firstVisit ? await incrementVisitorCount() : await getVisitorCount();
+        if (!cancelled) setVisitorCount(count);
+      } catch {
+        // The counter is a nice-to-have; hide it if the service is unreachable.
+      }
     };
 
-    const position: [number, number] = [43.55579933989852, 16.336398404284003];
+    loadCount();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-    return (
-        <BottomSection>
-            <ContactContainer>
-                <ContactLeftSide>
-                    <ContactInfo>
-                        <h3>Contact Info</h3>
-                        <p>Marina Studina 59</p>
-                        <p>21217 Kaštel Novi</p>
-                        <p><strong>Anita Kuzmanić</strong></p>
-                        <p>📞 098 9932 710</p>
-                        <p>✉️ <a href="mailto:vinarija.kuzmanic@gmail.com">vinarija.kuzmanic@gmail.com</a></p>
-                    </ContactInfo>
-                    <MyMap position={position} />
-                </ContactLeftSide>
-                <ContactForm onSubmit={handleSubmit}>
-                    <h3>{formatMessage({ id: "contact.title" })}</h3>
+  const validate = (data: FormData) => {
+    const newErrors: Partial<Record<FieldName, string>> = {};
+    if (!data.from_name.trim()) newErrors.from_name = formatMessage({ id: "contact.name.error" });
+    if (!data.reply_to.trim()) newErrors.reply_to = formatMessage({ id: "contact.email.error" });
+    else if (!EMAIL_PATTERN.test(data.reply_to.trim()))
+      newErrors.reply_to = formatMessage({ id: "contact.email.invalid" });
+    if (data.verification.trim() !== VERIFICATION_ANSWER)
+      newErrors.verification = formatMessage({ id: "contact.verification.error" });
+    if (!data.message.trim()) newErrors.message = formatMessage({ id: "contact.message.error" });
+    return newErrors;
+  };
 
-                    <label>{formatMessage({ id: "contact.name" })}</label>
-                    <input type="text" name="from_name" value={formData.from_name} onChange={handleChange} />
-                    {errors.from_name && <ErrorText>{errors.from_name}</ErrorText>}
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const name = e.target.name as FieldName;
+    setFormData((prev) => ({ ...prev, [name]: e.target.value }));
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: undefined }));
+  };
 
-                    <label>{formatMessage({ id: "contact.email" })}</label>
-                    <input type="email" name="reply_to" value={formData.reply_to} onChange={handleChange} />
-                    {errors.reply_to && <ErrorText>{errors.reply_to}</ErrorText>}
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const newErrors = validate(formData);
+    setErrors(newErrors);
 
-                    <label>{formatMessage({ id: "contact.verification" })}</label>
-                    <input type="text" name="verification" value={formData.verification} onChange={handleChange} />
-                    {errors.verification && <ErrorText>{errors.verification}</ErrorText>}
+    const firstInvalid = FIELD_ORDER.find((field) => newErrors[field]);
+    if (firstInvalid) {
+      formRef.current?.querySelector<HTMLElement>(`[name="${firstInvalid}"]`)?.focus();
+      return;
+    }
 
-                    <label>{formatMessage({ id: "contact.message" })}</label>
-                    <textarea name="message" rows={4} value={formData.message} onChange={handleChange}></textarea>
-                    {errors.message && <ErrorText>{errors.message}</ErrorText>}
+    setLoading(true);
+    try {
+      await emailjs.send(
+        EMAIL_SERVICE_SERVICE_ID,
+        EMAIL_SERVICE_TEMPLATE_ID,
+        { ...formData },
+        EMAIL_SERVICE_PUBLIC_KEY
+      );
+      toast.success(formatMessage({ id: "contact.success" }));
+      setFormData(EMPTY_FORM);
+    } catch {
+      toast.error(formatMessage({ id: "contact.error" }));
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                    <SubmitButton type="submit" $isDisabled={loading} disabled={loading}>
-                        {loading ? formatMessage({ id: "contact.sending" }) : formatMessage({ id: "contact.send" })}
-                    </SubmitButton>
-                </ContactForm>
-            </ContactContainer>
-            <VisitorCounter>
-                <FormattedMessage id="visitor.count" /> <strong>{visitorCount}</strong>
-            </VisitorCounter>
-        </BottomSection>
-    );
+  const fieldProps = (name: FieldName) => ({
+    id: `contact-${name}`,
+    name,
+    value: formData[name],
+    onChange: handleChange,
+    required: true,
+    "aria-invalid": errors[name] ? true : undefined,
+    "aria-describedby": errors[name] ? `contact-${name}-error` : undefined,
+  });
+
+  const renderError = (name: FieldName) =>
+    errors[name] && <ErrorText id={`contact-${name}-error`}>{errors[name]}</ErrorText>;
+
+  return (
+    <Section id="contact" $tone="cream" tabIndex={-1} aria-labelledby="contact-title">
+      <Container>
+        <SectionHeader>
+          <Eyebrow>{formatMessage({ id: "contact.eyebrow" })}</Eyebrow>
+          <SectionTitle id="contact-title">{formatMessage({ id: "contact.heading" })}</SectionTitle>
+          <Divider />
+          <p>{formatMessage({ id: "contact.intro" })}</p>
+        </SectionHeader>
+
+        <ContactGrid>
+          <ContactLeftSide>
+            <InfoCard>
+              <h3>{formatMessage({ id: "contact.info.title" })}</h3>
+              <InfoList>
+                <li>
+                  <MapPinIcon />
+                  <span>
+                    {CONTACT.street}
+                    <br />
+                    {CONTACT.city}
+                  </span>
+                </li>
+                <li>
+                  <UserIcon />
+                  <span>{CONTACT.person}</span>
+                </li>
+                <li>
+                  <PhoneIcon />
+                  <a href={CONTACT.phoneHref}>{CONTACT.phoneDisplay}</a>
+                </li>
+                <li>
+                  <MailIcon />
+                  <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
+                </li>
+              </InfoList>
+            </InfoCard>
+            <MapFrame>
+              <MapContainer
+                center={CONTACT.mapPosition}
+                zoom={16}
+                scrollWheelZoom={false}
+                style={{ height: "100%", width: "100%" }}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <Marker position={CONTACT.mapPosition} icon={markerIcon} alt={formatMessage({ id: "carousel.text1" })}>
+                  <Popup>
+                    <strong>{formatMessage({ id: "carousel.text1" })}</strong>
+                    <br />
+                    {CONTACT.street}, {CONTACT.city}
+                  </Popup>
+                </Marker>
+              </MapContainer>
+            </MapFrame>
+          </ContactLeftSide>
+
+          <ContactForm ref={formRef} onSubmit={handleSubmit} noValidate>
+            <h3>{formatMessage({ id: "contact.title" })}</h3>
+
+            <Field>
+              <label htmlFor="contact-from_name">{formatMessage({ id: "contact.name" })}</label>
+              <input type="text" autoComplete="name" {...fieldProps("from_name")} />
+              {renderError("from_name")}
+            </Field>
+
+            <Field>
+              <label htmlFor="contact-reply_to">{formatMessage({ id: "contact.email" })}</label>
+              <input type="email" autoComplete="email" {...fieldProps("reply_to")} />
+              {renderError("reply_to")}
+            </Field>
+
+            <Field>
+              <label htmlFor="contact-message">{formatMessage({ id: "contact.message" })}</label>
+              <textarea rows={5} {...fieldProps("message")} />
+              {renderError("message")}
+            </Field>
+
+            <Field>
+              <label htmlFor="contact-verification">
+                {formatMessage({ id: "contact.verification" }, { number: VERIFICATION_ANSWER })}
+              </label>
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                {...fieldProps("verification")}
+              />
+              {renderError("verification")}
+            </Field>
+
+            <SubmitButton type="submit" disabled={loading} aria-busy={loading}>
+              {formatMessage({ id: loading ? "contact.sending" : "contact.send" })}
+            </SubmitButton>
+          </ContactForm>
+        </ContactGrid>
+
+        {visitorCount !== null && (
+          <VisitorCounter>
+            {formatMessage({ id: "visitor.count" })} <strong>{visitorCount.toLocaleString()}</strong>
+          </VisitorCounter>
+        )}
+      </Container>
+    </Section>
+  );
 };
 
 export default ContactData;
 
-const ContactContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 3rem;
-  width: 100%;
-  max-width: 1200px; 
-  margin: 0 auto; 
-  
-  @media (max-width: 1024px) {
-    gap: 2rem;
-  }
+const ContactGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  align-items: stretch;
 
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 1.5rem;
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
   }
 `;
 
 const ContactLeftSide = styled.div`
   display: flex;
   flex-direction: column;
-  flex: 1; 
-  max-width: 450px;
-  justify-content: space-evenly;
-  gap: inherit;
+  gap: 1.5rem;
+`;
 
-    @media (max-width: 768px) {
-    max-width: 100%;
+const cardStyles = `
+  border-radius: var(--radius);
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--line);
+`;
+
+const InfoCard = styled.div`
+  ${cardStyles};
+  padding: clamp(1.5rem, 3vw, 2rem);
+
+  h3 {
+    font-size: 1.375rem;
+    margin-bottom: 1.25rem;
   }
 `;
 
-const ContactInfo = styled.div`
-  background: #fff;
-  padding: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    background: url(/assets/visit.png) no-repeat center, #f5e8d9;
-    // border: 1px solid #5a1f1f;r
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
-    /* transform: rotate(-2deg); */
-    font-family: "Georgia", serif;
+const InfoList = styled.ul`
+  display: grid;
+  gap: 0.875rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+  color: var(--ink);
 
-  h3 {
-    font-size: 1.6rem;
-    margin-bottom: 1.2rem;
-    color: #7b1e25;
-    text-transform: uppercase;
-    text-align: center;
-    margin-top: 0rem;
-    letter-spacing: 1px;
-
-    @media (max-width: 768px) {
-    margin-top: 0rem;
-  }
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    line-height: 1.5;
   }
 
-  p {
-    margin: 0.6rem 0;
-    font-size: 1rem;
-    color: #000000 !important;
+  svg {
+    flex-shrink: 0;
+    color: var(--wine-700);
   }
 
   a {
-    color: #7b1e25;
+    color: var(--wine-700);
+    font-weight: 500;
     text-decoration: none;
-    font-weight: bold;
+    word-break: break-word;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 `;
 
+const MapFrame = styled.div`
+  ${cardStyles};
+  flex: 1;
+  min-height: 280px;
+  overflow: hidden;
+  /* Keep Leaflet's high z-index panes below the fixed header. */
+  isolation: isolate;
+  position: relative;
+  z-index: 0;
+`;
+
 const ContactForm = styled.form`
+  ${cardStyles};
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(12px);
-  opacity: 0.8;
-  width: 100%;
-  max-width: 500px;
-
-  @media (max-width: 768px) {
-    width: auto;
-    max-width: 100%;
-    padding: 1.5rem;
-  }
+  gap: 1.25rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
 
   h3 {
-    font-size: 1.7rem;
-    margin-bottom: 1rem;
-    color: #7b1e25;
-    margin-top: 0;
-    text-transform: uppercase;
-    text-align: center;
-    letter-spacing: 1px;
+    font-size: 1.375rem;
+    margin: 0;
+  }
+`;
 
-    @media (max-width: 768px) {
-    margin-top: 0rem;
-  }
-  }
+const Field = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
 
   label {
-    font-size: 1rem;
-    color: #7b1e25;
+    font-family: var(--font-ui);
+    font-size: 0.875rem;
     font-weight: 600;
-    align-self: flex-start;
+    color: var(--ink);
   }
 
   input,
   textarea {
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    background: #f8f8f8;
-    color: #7b1e25;
+    width: 100%;
+    padding: 0.75rem 0.875rem;
+    border: 1px solid #cdbfab;
+    border-radius: var(--radius-sm);
+    background: var(--white);
+    color: var(--ink);
+    font-family: var(--font-ui);
     font-size: 1rem;
-    transition: all 0.3s ease-in-out;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
     &:focus {
       outline: none;
-      border-color: #7b1e25;
-      box-shadow: 0 0 8px rgba(123, 30, 37, 0.4);
-      background: #ffffff;
+      border-color: var(--wine-700);
+      box-shadow: 0 0 0 3px rgba(110, 26, 36, 0.18);
+    }
+
+    &[aria-invalid="true"] {
+      border-color: var(--error);
     }
   }
 
   textarea {
     resize: vertical;
-    min-height: 100px;
+    min-height: 120px;
   }
 `;
-
-const SubmitButton = styled.button<ButtonProps>`
-  background: linear-gradient(135deg, #7b1e25, #ff9f43);
-  background-size: 200% 200%;
-  color: white;
-  padding: 1rem;
-  border: none;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-position 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-
-  &:hover {
-    background-position: right center;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(123, 30, 37, 0.3);
-  }
-
-  &:disabled {
-    background: #d6d6d6;
-    cursor: not-allowed;
-  }
-`;
-
 
 const ErrorText = styled.span`
-  font-size: 0.9rem;
-  color: #ff4d4d;
-  margin-top: 0.3rem;
-  font-weight: bold;
-  text-align: start;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--error);
 `;
 
-const BottomSection = styled.section`
-  width: 100%;
-  background: linear-gradient(to bottom, #ffffff, #f7f7f7);
-  padding: 4rem 2rem;
-  color: black;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3rem;
-  box-sizing: border-box;
-
-  @media (max-width: 768px) {
-    padding: 4rem 1rem;
-  }
-`;
-
-const VisitorCounter = styled.div`
-  background: #fff;
-  color: #7b1e25;
-  padding: 1rem 0;
-  text-align: center;
-  width: 100%;
-  max-width: 300px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(12px);
-
-  @media (max-width: 768px) {
-    font-size: 1rem;
-    max-width: none;
-  }
-`;
-
-const SetView = ({ center }: { center: [number, number] }) => {
-    const map = useMap();
-    useEffect(() => {
-        map.setView(center, 17);
-    }, [map, center]);
-    return null;
-};
-
-const StyledMap = styled(MapContainer)`
-  width: 100%;
-  height: 350px; 
-
-  @media (max-width: 768px) {
-    height: 250px;
-  }
+const SubmitButton = styled.button`
+  ${buttonPrimary};
+  align-self: flex-start;
+  min-width: 160px;
+  margin-top: 0.25rem;
 
   @media (max-width: 480px) {
-    height: 200px;
+    align-self: stretch;
   }
 `;
 
+const VisitorCounter = styled.p`
+  margin: 2.5rem 0 0;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  color: var(--muted);
 
-const MyMap: React.FC<{ position: [number, number] }> = ({ position }) => {
-    return (
-        <StyledMap>
-            <SetView center={position} />
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            <Marker position={position} icon={customIcon}>
-                <Popup>Apartman Kuzmanić, Marina Studina 59, 21217 Kaštel Novi</Popup>
-            </Marker>
-        </StyledMap>
-    );
-};
+  strong {
+    color: var(--wine-700);
+  }
+`;

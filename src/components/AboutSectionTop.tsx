@@ -1,91 +1,88 @@
 import { useIntl } from "react-intl";
-import styled, { keyframes } from "styled-components";
-import { useState } from "react";
-import { Section } from "./TourContent";
+import styled from "styled-components";
+import { Container, Divider, Eyebrow, Lead, MediaFrame, Section, SectionTitle } from "./ui";
 
-const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-`;
-
-const blurLoad = keyframes`
-  from { filter: blur(5px); opacity: 0; }
-  to { filter: blur(0); opacity: 1; }
-`;
-
-const Container = styled.section`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 3rem 2rem;
-  animation: ${fadeIn} 1s ease-in-out;
-`;
-
-
-const Content = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  gap: 2rem;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    text-align: center;
-  }
-`;
-
-const MainImage = styled.img`
-  flex: 1;
-  max-width: 341px;
-  height: 341px;
-  border-radius: 2px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease-in-out;
-  animation: ${blurLoad} 1s ease-out;
-
-  @media (max-width: 768px) {
-    max-width: 100% !important;
-  }
-`;
-
-const AboutSection = () => {
+const AboutSectionTop = () => {
   const { formatMessage } = useIntl();
-  const [loaded, setLoaded] = useState(false);
 
   return (
-    <Container>
-      <Content>
-        <Section>
-          <h3 style={{
-            borderBottom: "1px solid",
-            padding: "1rem"
-          }}>{formatMessage({ id: "welcome.title" })}</h3>
-          <p>{formatMessage({ id: "about.paragraph1" })}</p>
-          <p>{formatMessage({ id: "about.paragraph2" })}</p>
-        </Section>
-        <MainImage
-          src="assets/f4.jpeg"
-          alt="Winery"
-          className={loaded ? "loaded" : ""}
-          onLoad={() => setLoaded(true)}
-        />
-      </Content>
-      <Content style={{ marginTop: "32px" }}>
-        <MainImage
-          style={{ maxWidth: "none" }}
-          src="assets/f3.jpg"
-          alt="Winery"
-          className={loaded ? "loaded" : ""}
-          onLoad={() => setLoaded(true)}
-        />
-        <Section>
-          <p>{formatMessage({ id: "about.paragraph3" })}</p>
-        </Section>
+    <Section aria-labelledby="about-title">
+      <Container>
+        <Row>
+          <Text>
+            <Eyebrow>{formatMessage({ id: "about.eyebrow" })}</Eyebrow>
+            <SectionTitle id="about-title">{formatMessage({ id: "welcome.title" })}</SectionTitle>
+            <Divider />
+            <Lead>{formatMessage({ id: "about.paragraph1" })}</Lead>
+            <p>{formatMessage({ id: "about.paragraph2" })}</p>
+          </Text>
+          <MediaFrame $ratio="4 / 3">
+            <img
+              src="assets/f4.jpeg"
+              alt={formatMessage({ id: "photo.f4" })}
+              loading="lazy"
+              decoding="async"
+            />
+          </MediaFrame>
+        </Row>
 
-      </Content>
-    </Container>
+        <Row $reverse>
+          <Text>
+            <Quote>{formatMessage({ id: "about.paragraph3" })}</Quote>
+          </Text>
+          <MediaFrame $ratio="3 / 2" $offset="left">
+            <img
+              src="assets/f3.jpg"
+              alt={formatMessage({ id: "photo.f3" })}
+              loading="lazy"
+              decoding="async"
+            />
+          </MediaFrame>
+        </Row>
+      </Container>
+    </Section>
   );
 };
 
-export default AboutSection;
+export default AboutSectionTop;
+
+const Row = styled.div<{ $reverse?: boolean }>`
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  align-items: center;
+  gap: clamp(2.5rem, 6vw, 5rem);
+
+  & + & {
+    margin-top: clamp(4rem, 8vw, 6rem);
+  }
+
+  ${({ $reverse }) =>
+    $reverse &&
+    `
+    grid-template-columns: 1fr 1.1fr;
+    & > :first-child { order: 2; }
+  `}
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+
+    & > :first-child {
+      order: 0;
+    }
+  }
+`;
+
+const Text = styled.div`
+  max-width: 60ch;
+`;
+
+const Quote = styled.p`
+  position: relative;
+  margin: 0;
+  padding-left: 1.5rem;
+  border-left: 2px solid var(--gold);
+  font-size: clamp(1.125rem, 2vw, 1.3125rem);
+  font-style: italic;
+  line-height: 1.75;
+  color: var(--ink);
+`;

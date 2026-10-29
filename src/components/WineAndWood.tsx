@@ -1,49 +1,36 @@
-import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls, useGLTF } from "@react-three/drei";
-import { useEffect } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Center, useGLTF } from "@react-three/drei";
+import { useRef } from "react";
 import * as THREE from "three";
-
-const centerObject = (object: THREE.Object3D) => {
-  const bbox = new THREE.Box3().setFromObject(object);
-  const center = new THREE.Vector3();
-  bbox.getCenter(center);
-  object.position.sub(center);
-};
-
-const SetWhiteBackground = () => {
-  const { scene } = useThree();
-
-  useEffect(() => {
-    scene.background = new THREE.Color("white");
-    scene.environment = null; 
-  }, [scene]);
-
-  return null;
-};
+import { usePrefersReducedMotion } from "../hooks/useMediaQuery";
 
 const WoodenTable = () => {
-  const { scene } = useGLTF("/assets/winet.glb");
+  const { scene } = useGLTF("assets/winet.glb");
+  const groupRef = useRef<THREE.Group>(null);
+  const reducedMotion = usePrefersReducedMotion();
 
-  useEffect(() => {
-    if (scene) {
-      centerObject(scene);
-      scene.position.set(0, 0, 0); 
+  useFrame((_, delta) => {
+    if (groupRef.current && !reducedMotion) {
+      groupRef.current.rotation.y += delta * 0.35;
     }
-  }, [scene]);
+  });
 
-  return <primitive object={scene} scale={[0.3, 0.3, 0.3]} />;
-};
-
-const WineAndWood = () => {
   return (
-    <Canvas camera={{ position: [0, 2, 5], fov: 70 }}> 
-      <SetWhiteBackground />
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[3, 3, 3]} intensity={4} />
-      <WoodenTable />
-      <OrbitControls enableZoom={false} enablePan={false} />
-    </Canvas>
+    <group ref={groupRef}>
+      <Center>
+        <primitive object={scene} scale={0.3} />
+      </Center>
+    </group>
   );
 };
+
+// Auto-rotates instead of using OrbitControls, which would swallow touch scrolling.
+const WineAndWood = () => (
+  <Canvas camera={{ position: [0, 2.6, 9.5], fov: 40 }} dpr={[1, 2]}>
+    <ambientLight intensity={0.8} />
+    <directionalLight position={[3, 3, 3]} intensity={3} />
+    <WoodenTable />
+  </Canvas>
+);
 
 export default WineAndWood;

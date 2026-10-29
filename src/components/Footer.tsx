@@ -1,35 +1,65 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { useIntl } from "react-intl";
-import WineScene from "./WineScene";
+import { CONTACT } from "../data/contact";
+import { NAV_ITEMS } from "../data/navigation";
+import { MailIcon, MapPinIcon, PhoneIcon } from "./Icons";
 
 const Footer: React.FC = () => {
   const { formatMessage } = useIntl();
+  const year = new Date().getFullYear();
 
   return (
     <FooterWrapper>
-      <FooterContent>
+      <FooterGrid>
         <div>
-          <FooterText>
-            Marina Studina 59
-            <br />
-            21217 Kaštel Novi
-          </FooterText>
-          <Spacer />
-          <FooterText>
-            Anita Kuzmanić
-            <br />
-            098 9932 710
-            <br />
-            vinarija.kuzmanic@gmail.com
-          </FooterText>
-          <Separator />
-          <FooterText>{formatMessage({ id: "footer.text" })}</FooterText>
+          <FooterBrand>
+            <img src="assets/logo.png" alt="" width={56} height={56} loading="lazy" />
+            <span>{formatMessage({ id: "carousel.text1" })}</span>
+          </FooterBrand>
+          <FooterText>{formatMessage({ id: "footer.tagline" })}</FooterText>
         </div>
+
         <div>
-          <WineScene />
+          <FooterHeading>{formatMessage({ id: "footer.contact" })}</FooterHeading>
+          <FooterList>
+            <li>
+              <MapPinIcon size={18} />
+              <span>
+                {CONTACT.street}
+                <br />
+                {CONTACT.city}
+              </span>
+            </li>
+            <li>
+              <PhoneIcon size={18} />
+              <a href={CONTACT.phoneHref}>{CONTACT.phoneDisplay}</a>
+            </li>
+            <li>
+              <MailIcon size={18} />
+              <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
+            </li>
+          </FooterList>
         </div>
-      </FooterContent>
+
+        <nav aria-label={formatMessage({ id: "footer.explore" })}>
+          <FooterHeading>{formatMessage({ id: "footer.explore" })}</FooterHeading>
+          <FooterList>
+            {NAV_ITEMS.map((item) => (
+              <li key={item.to}>
+                <Link to={item.to}>{formatMessage({ id: item.labelId })}</Link>
+              </li>
+            ))}
+          </FooterList>
+        </nav>
+      </FooterGrid>
+
+      <FooterBottom>
+        <p>
+          © {year} {formatMessage({ id: "footer.text" })}
+        </p>
+      </FooterBottom>
     </FooterWrapper>
   );
 };
@@ -37,58 +67,104 @@ const Footer: React.FC = () => {
 export default Footer;
 
 const FooterWrapper = styled.footer`
-  background-color: #1b1b1b;
-  padding: 20px 0;
-  width: 100%;
-  position: relative;
-  margin-top: auto;
+  background: var(--wine-950);
+  color: rgba(255, 255, 255, 0.78);
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
 `;
 
-const FooterContent = styled.div`
-  width: 90%;
-  max-width: 1170px;
+const FooterGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 0.8fr;
+  gap: 3rem;
+  max-width: 1180px;
   margin: 0 auto;
+  padding: 4.5rem 20px 3rem;
+
+  @media (min-width: 768px) {
+    padding-inline: 32px;
+  }
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+    gap: 2.25rem;
+  }
+`;
+
+const FooterBrand = styled.div`
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center; 
-  gap: 20px; 
+  align-items: center;
+  gap: 0.875rem;
+  margin-bottom: 1rem;
 
-  @media (max-width: 768px) {
-    flex-direction: column; 
-    text-align: center; 
-    gap: 10px; 
+  img {
+    border-radius: 6px;
+  }
+
+  span {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--white);
   }
 `;
 
-const FooterText = styled.div`
-  margin: 10px 0;
-  line-height: 1.5rem;
-  color: #979797;
-  text-align: left;
+const FooterText = styled.p`
+  max-width: 34ch;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-body);
+  line-height: 1.7;
+`;
 
-  @media (max-width: 768px) {
-    text-align: center; 
-    font-size: 14px; 
+const FooterHeading = styled.h2`
+  margin-bottom: 1.125rem;
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+`;
+
+const FooterList = styled.ul`
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    line-height: 1.5;
+  }
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--gold);
+  }
+
+  a {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    word-break: break-word;
+
+    &:hover {
+      color: var(--white);
+      text-decoration: underline;
+    }
   }
 `;
 
-const Spacer = styled.div`
-  height: 20px;
+const FooterBottom = styled.div`
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem 20px;
+  text-align: center;
 
-  @media (max-width: 768px) {
-    height: 10px;
-  }
-`;
-
-const Separator = styled.hr`
-  border: 0;
-  height: 1px;
-  background: #4b4b4b;
-  width: 100%;
-  margin: 16px 0;
-
-  @media (max-width: 768px) {
-    margin: 10px 0; 
+  p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
   }
 `;
