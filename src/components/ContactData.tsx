@@ -6,7 +6,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import emailjs from "emailjs-com";
 import { toast } from "react-toastify";
-import { getVisitorCount, incrementVisitorCount } from "../utils/redisClient";
+import { getVisitorCount, incrementVisitorCount, isVisitorCounterEnabled } from "../utils/redisClient";
 import { EMAIL_SERVICE_PUBLIC_KEY, EMAIL_SERVICE_SERVICE_ID, EMAIL_SERVICE_TEMPLATE_ID } from "../config";
 
 const customIcon = new L.Icon({
@@ -43,16 +43,21 @@ interface FormData {
 
 const ContactData: React.FC = () => {
     const { formatMessage } = useIntl();
-    const [visitorCount, setVisitorCount] = useState<number>(0);
+    // null hides the counter (disabled, still loading or request failed)
+    const [visitorCount, setVisitorCount] = useState<number | null>(null);
 
     useEffect(() => {
+        if (!isVisitorCounterEnabled()) return;
         async function fetchAndIncrement() {
-            const count = await getVisitorCount();
-            setVisitorCount(count);
-            if (!sessionStorage.getItem("visited")) {
-                const newCount = await incrementVisitorCount();
-                setVisitorCount(newCount);
-                sessionStorage.setItem("visited", "true");
+            try {
+                if (!sessionStorage.getItem("visited")) {
+                    setVisitorCount(await incrementVisitorCount());
+                    sessionStorage.setItem("visited", "true");
+                } else {
+                    setVisitorCount(await getVisitorCount());
+                }
+            } catch {
+                setVisitorCount(null);
             }
         }
         fetchAndIncrement();
@@ -144,9 +149,11 @@ const ContactData: React.FC = () => {
                     </SubmitButton>
                 </ContactForm>
             </ContactContainer>
-            <VisitorCounter>
-                <FormattedMessage id="visitor.count" /> <strong>{visitorCount}</strong>
-            </VisitorCounter>
+            {visitorCount !== null && (
+                <VisitorCounter>
+                    <FormattedMessage id="visitor.count" /> <strong>{visitorCount}</strong>
+                </VisitorCounter>
+            )}
         </BottomSection>
     );
 };

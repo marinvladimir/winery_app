@@ -1,17 +1,24 @@
-import { UPSTASH_REDIS_REST_TOKEN, UPSTASH_REDIS_REST_URL } from "../config";
+import { VISITOR_COUNTER_ENABLED } from "../config";
 
-export async function getVisitorCount(): Promise<number> {
-  const response = await fetch(`${UPSTASH_REDIS_REST_URL}/get/visitorCount`, {
-    headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` },
-  });
-  const data = await response.json();
-  return data.result ? Number(data.result) : 0;
+const VISITORS_ENDPOINT = "/.netlify/functions/visitors";
+
+export function isVisitorCounterEnabled(): boolean {
+  return VISITOR_COUNTER_ENABLED;
 }
 
-export async function incrementVisitorCount(): Promise<number> {
-  const response = await fetch(`${UPSTASH_REDIS_REST_URL}/incr/visitorCount`, {
-    headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` },
-  });
+async function requestCount(method: "GET" | "POST"): Promise<number> {
+  const response = await fetch(VISITORS_ENDPOINT, { method });
+  if (!response.ok) {
+    throw new Error(`Visitor counter request failed: ${response.status}`);
+  }
   const data = await response.json();
-  return data.result ? Number(data.result) : 0;
+  return Number(data.count) || 0;
+}
+
+export function getVisitorCount(): Promise<number> {
+  return requestCount("GET");
+}
+
+export function incrementVisitorCount(): Promise<number> {
+  return requestCount("POST");
 }

@@ -1,5 +1,28 @@
 # React + TypeScript + Vite
 
+## Visitor counter
+
+The visitor counter on the contact page is served by a Netlify Function
+(`netlify/functions/visitors.ts`) that proxies to Upstash Redis, so the Upstash
+credentials never reach the browser. The frontend only calls
+`/.netlify/functions/visitors` (`GET` reads the count, `POST` increments it).
+
+Set these **server-side** environment variables in the Netlify UI
+(Site configuration → Environment variables) or in a local `.env` for
+`netlify dev`:
+
+| Variable | Description |
+| --- | --- |
+| `UPSTASH_REDIS_REST_URL` | Upstash Redis REST URL |
+| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST token |
+
+Do **not** prefix them with `VITE_`: every `VITE_*` variable is inlined into the
+public JS bundle. Set `VITE_VISITOR_COUNTER_ENABLED=false` at build time to hide
+the counter entirely; it is also hidden whenever the function request fails.
+
+To run the site with the function locally, use `netlify dev` (plain `npm run dev`
+does not serve functions, so the counter stays hidden).
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

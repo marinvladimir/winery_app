@@ -7,7 +7,5 @@ export const EMAIL_SERVICE_SERVICE_ID =
   import.meta.env.VITE_JS_SERVICE_ID || "";
 export const EMAIL_SERVICE_PUBLIC_KEY =
   import.meta.env.VITE_JS_PUBLIC_KEY || "";
-export const UPSTASH_REDIS_REST_TOKEN =
-  import.meta.env.VITE_UPSTASH_REDIS_REST_TOKEN || "";
-export const UPSTASH_REDIS_REST_URL =
-  import.meta.env.VITE_UPSTASH_REDIS_REST_URL || "";
+export const VISITOR_COUNTER_ENABLED =
+  import.meta.env.VITE_VISITOR_COUNTER_ENABLED !== "false";
