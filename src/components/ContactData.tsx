@@ -72,7 +72,7 @@ const ContactData: React.FC = () => {
     };
 
     const validateForm = (): boolean => {
-        let newErrors: Partial<FormData> = {};
+        const newErrors: Partial<FormData> = {};
 
         if (!formData.from_name.trim()) newErrors.from_name = formatMessage({ id: "contact.name.error" })
         if (!formData.reply_to.trim()) newErrors.reply_to = formatMessage({ id: "contact.email.error" })
@@ -97,14 +97,14 @@ const ContactData: React.FC = () => {
             );
             toast.success("Poruka uspješno poslana!");
             setFormData({ from_name: "", reply_to: "", verification: "", message: "" });
-        } catch (error) {
+        } catch {
             toast.error("Došlo je do greške. Pokušajte ponovo.");
         } finally {
             setLoading(false);
         }
     };
 
-    const position: [number, number] = [43.55579933989852, 16.336398404284003];
+    const position: [number, number] = [43.55579933989852, 16.336398404284];
 
     return (
         <BottomSection>

@@ -82,7 +82,7 @@ const Carousel = () => {
             { label: formatMessage({ id: "header.link2" }), path: "#/tour" },
             { label: formatMessage({ id: "header.link3" }), path: "#/gallery" },
           ].map((item, i) => (
-            <NavItem key={i} onClick={() => { handleNavigation(item.path); () => setIsMenuOpen(false); }} className={isActive(item.path) ? "active" : ""}>
+            <NavItem key={i} onClick={() => handleNavigation(item.path)} className={isActive(item.path) ? "active" : ""}>
               {item.label}
             </NavItem>
           ))}

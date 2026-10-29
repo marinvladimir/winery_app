@@ -17,7 +17,7 @@ const TourContent: React.FC = () => {
     arrows: false,
     adaptiveHeight: false,
     beforeChange: () => {
-      document.activeElement instanceof HTMLElement && document.activeElement.blur();
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     },
   };
 
