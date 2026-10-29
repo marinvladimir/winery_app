@@ -107,5 +107,14 @@
   "footer.tagline": "Obiteljska boutique vinarija na obroncima Kozjaka, između Splita i Trogira.",
   "footer.contact": "Kontakt",
   "footer.explore": "Istražite",
-  "footer.text": "Vinarija Kuzmanić · Kaštel Novi"
+  "footer.text": "Vinarija Kuzmanić · Kaštel Novi",
+  "hero.scroll": "Pomakni se prema dolje",
+  "nav.top": "Natrag na vrh",
+  "stats.label": "Vinarija u brojkama",
+  "stats.wines": "Autohtonih vina",
+  "stats.handmade": "Ručni rad u vinogradu",
+  "stats.guests": "Gostiju najviše po turi",
+  "wine.class.premium": "Vrhunsko vino",
+  "wine.class.quality": "Kvalitetno vino",
+  "contact.sent": "Poslano"
 }

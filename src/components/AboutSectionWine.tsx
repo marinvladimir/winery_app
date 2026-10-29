@@ -1,7 +1,11 @@
 import { lazy } from "react";
 import { useIntl } from "react-intl";
 import styled from "styled-components";
+import { motion } from "framer-motion";
 import DeferredScene from "./DeferredScene";
+import Reveal, { RevealItem } from "./Reveal";
+import RevealImage from "./RevealImage";
+import { fadeUp, inViewProps, staggerContainer } from "./motionVariants";
 import {
   Container,
   Divider,
@@ -14,11 +18,12 @@ import {
 
 const WineAndWood = lazy(() => import("./WineAndWood"));
 
+// Quality classes as printed on the labels.
 const WINES = [
-  { name: "Crljenak", src: "assets/1.jpg", typeId: "wine.type.red" },
-  { name: "Trbljan bijeli", src: "assets/2 (1).jpg", typeId: "wine.type.white" },
-  { name: "Babica", src: "assets/3.jpg", typeId: "wine.type.red" },
-  { name: "Plavac mali", src: "assets/4.jpg", typeId: "wine.type.red" },
+  { name: "Crljenak", src: "assets/1.jpg", typeId: "wine.type.red", classId: "wine.class.premium" },
+  { name: "Trbljan bijeli", src: "assets/2 (1).jpg", typeId: "wine.type.white", classId: "wine.class.quality" },
+  { name: "Babica", src: "assets/3.jpg", typeId: "wine.type.red", classId: "wine.class.quality" },
+  { name: "Plavac mali", src: "assets/4.jpg", typeId: "wine.type.red", classId: "wine.class.quality" },
 ];
 
 const AboutSectionWine = () => {
@@ -29,16 +34,23 @@ const AboutSectionWine = () => {
       <Section $tone="cream" aria-labelledby="wines-title">
         <Container>
           <SectionHeader>
-            <Eyebrow>{formatMessage({ id: "wine.eyebrow" })}</Eyebrow>
-            <SectionTitle id="wines-title">{formatMessage({ id: "carousel.text3" })}</SectionTitle>
+            <Reveal>
+              <Eyebrow>{formatMessage({ id: "wine.eyebrow" })}</Eyebrow>
+              <SectionTitle id="wines-title">{formatMessage({ id: "carousel.text3" })}</SectionTitle>
+            </Reveal>
             <Divider />
-            <p>{formatMessage({ id: "wine.intro" })}</p>
+            <Reveal delay={0.15}>
+              <p>{formatMessage({ id: "wine.intro" })}</p>
+            </Reveal>
           </SectionHeader>
 
-          <WineGrid>
+          <WineGrid {...inViewProps} variants={staggerContainer(0.12)}>
             {WINES.map((wine) => (
-              <WineCard key={wine.name}>
+              <WineCard key={wine.name} variants={fadeUp}>
                 <WineImage>
+                  <Badge $premium={wine.classId === "wine.class.premium"}>
+                    {formatMessage({ id: wine.classId })}
+                  </Badge>
                   <img
                     src={wine.src}
                     alt={formatMessage({ id: "wine.alt" }, { name: wine.name })}
@@ -61,23 +73,24 @@ const AboutSectionWine = () => {
       <Section aria-labelledby="stay-title">
         <Container>
           <StayRow>
-            <div>
+            <Reveal stagger={0.1}>
               <DeferredScene width={280} height={220} align="start">
                 <WineAndWood />
               </DeferredScene>
-              <Eyebrow>{formatMessage({ id: "stay.eyebrow" })}</Eyebrow>
-              <SectionTitle id="stay-title">{formatMessage({ id: "stay.title" })}</SectionTitle>
+              <RevealItem>
+                <Eyebrow>{formatMessage({ id: "stay.eyebrow" })}</Eyebrow>
+                <SectionTitle id="stay-title">{formatMessage({ id: "stay.title" })}</SectionTitle>
+              </RevealItem>
               <Divider />
-              <p>{formatMessage({ id: "about.last.section.paragraph1" })}</p>
-              <p>{formatMessage({ id: "about.last.section.paragraph2" })}</p>
-            </div>
+              <RevealItem>
+                <p>{formatMessage({ id: "about.last.section.paragraph1" })}</p>
+              </RevealItem>
+              <RevealItem>
+                <p>{formatMessage({ id: "about.last.section.paragraph2" })}</p>
+              </RevealItem>
+            </Reveal>
             <MediaFrame $ratio="3 / 2">
-              <img
-                src="assets/fb.jpg"
-                alt={formatMessage({ id: "photo.fb" })}
-                loading="lazy"
-                decoding="async"
-              />
+              <RevealImage src="assets/fb.jpg" alt={formatMessage({ id: "photo.fb" })} />
             </MediaFrame>
           </StayRow>
         </Container>
@@ -88,7 +101,7 @@ const AboutSectionWine = () => {
 
 export default AboutSectionWine;
 
-const WineGrid = styled.ul`
+const WineGrid = styled(motion.ul)`
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(1rem, 2.5vw, 2rem);
@@ -101,24 +114,45 @@ const WineGrid = styled.ul`
   }
 `;
 
-const WineCard = styled.li`
+const WineCard = styled(motion.li)`
   display: flex;
   flex-direction: column;
   overflow: hidden;
   border-radius: var(--radius);
   background: var(--white);
   box-shadow: var(--shadow-sm);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: box-shadow 0.4s ease, translate 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 
   &:hover {
-    transform: translateY(-6px);
+    translate: 0 -8px;
     box-shadow: var(--shadow-lg);
   }
 `;
 
 const WineImage = styled.div`
+  position: relative;
   overflow: hidden;
   background: #121018;
+
+  /* Light sweep across the bottle on hover. */
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 35%,
+      rgba(255, 255, 255, 0.16) 50%,
+      transparent 65%
+    );
+    transform: translateX(-100%);
+    transition: transform 0.9s ease;
+    pointer-events: none;
+  }
+
+  ${WineCard}:hover &::after {
+    transform: translateX(100%);
+  }
 
   img {
     width: 100%;
@@ -130,6 +164,31 @@ const WineImage = styled.div`
 
   ${WineCard}:hover & img {
     transform: scale(1.04);
+  }
+`;
+
+const Badge = styled.span<{ $premium: boolean }>`
+  position: absolute;
+  z-index: 1;
+  top: 12px;
+  left: 12px;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: ${({ $premium }) => ($premium ? "var(--gold-light)" : "rgba(255, 255, 255, 0.14)")};
+  color: ${({ $premium }) => ($premium ? "var(--wine-950)" : "rgba(255, 255, 255, 0.9)")};
+  border: 1px solid ${({ $premium }) => ($premium ? "transparent" : "rgba(255, 255, 255, 0.25)")};
+  backdrop-filter: blur(6px);
+  font-family: var(--font-ui);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  @media (max-width: 480px) {
+    top: 8px;
+    left: 8px;
+    font-size: 0.625rem;
+    letter-spacing: 0.04em;
   }
 `;
 

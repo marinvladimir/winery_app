@@ -1,4 +1,6 @@
 import styled, { css } from "styled-components";
+import { motion } from "framer-motion";
+import { EASE_OUT } from "./motionVariants";
 
 export const Container = styled.div<{ $narrow?: boolean }>`
   width: 100%;
@@ -32,12 +34,18 @@ export const SectionTitle = styled.h2`
   margin-bottom: 1.25rem;
 `;
 
-export const Divider = styled.span<{ $center?: boolean }>`
+export const Divider = styled(motion.span).attrs(() => ({
+  initial: { scaleX: 0 },
+  whileInView: { scaleX: 1 },
+  viewport: { once: true },
+  transition: { duration: 0.9, ease: EASE_OUT, delay: 0.2 },
+}))<{ $center?: boolean }>`
   display: block;
   width: 64px;
   height: 2px;
   margin: 0 ${({ $center }) => ($center ? "auto" : "0")} 1.75rem;
   background: var(--gold);
+  transform-origin: ${({ $center }) => ($center ? "center" : "left")};
 `;
 
 export const SectionHeader = styled.header`
@@ -47,6 +55,7 @@ export const SectionHeader = styled.header`
 
   ${Divider} {
     margin-inline: auto;
+    transform-origin: center;
   }
 `;
 
@@ -75,6 +84,18 @@ const buttonBase = css`
 
   &:hover {
     transform: translateY(-1px);
+  }
+
+  .btn-arrow {
+    transition: transform 0.25s ease;
+  }
+
+  &:hover .btn-arrow {
+    transform: translateX(4px);
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.98);
   }
 
   &:disabled {
@@ -135,13 +156,30 @@ export const MediaFrame = styled.figure<{ $ratio?: string; $offset?: "left" | "r
     border-radius: var(--radius);
     transform: ${({ $offset }) =>
       $offset === "left" ? "translate(-14px, 14px)" : "translate(14px, 14px)"};
+    transition: transform 0.6s ease;
+  }
+
+  &:hover::before {
+    transform: translate(0, 0);
+  }
+
+  .reveal-mask {
+    overflow: hidden;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    background: var(--cream-200);
   }
 
   img {
     width: 100%;
     aspect-ratio: ${({ $ratio }) => $ratio ?? "4 / 3"};
     object-fit: cover;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-md);
+  }
+
+  @media (max-width: 480px) {
+    &::before {
+      transform: ${({ $offset }) =>
+        $offset === "left" ? "translate(-8px, 8px)" : "translate(8px, 8px)"};
+    }
   }
 `;

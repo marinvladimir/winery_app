@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { useIntl } from "react-intl";
@@ -13,10 +13,22 @@ const Header = () => {
   const { pathname } = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 });
 
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 24);
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setIsScrolled(y > 24);
+      // Tuck the header away while reading down the page, bring it back on scroll up.
+      if (Math.abs(y - lastY) > 6) {
+        setIsHidden(y > lastY && y > 480);
+        lastY = y;
+      }
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -45,64 +57,79 @@ const Header = () => {
   ));
 
   return (
-    <HeaderBar $solid={isScrolled || isMenuOpen}>
-      <HeaderInner>
-        <Brand to="/" aria-label={formatMessage({ id: "nav.homeLabel" })}>
-          <img src="assets/logo.png" alt="" width={52} height={52} />
-          <BrandText>
-            <strong>Kuzmanić</strong>
-            <span>{formatMessage({ id: "brand.tagline" })}</span>
-          </BrandText>
-        </Brand>
+    <>
+      <ProgressBar style={{ scaleX: progress }} aria-hidden="true" />
+      <HeaderBar
+        $solid={isScrolled || isMenuOpen}
+        animate={{ y: isHidden && !isMenuOpen ? "-100%" : "0%" }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        // Keyboard users must always be able to reach the navigation.
+        onFocusCapture={() => setIsHidden(false)}
+      >
+        <HeaderInner>
+          <Brand to="/" aria-label={formatMessage({ id: "nav.homeLabel" })}>
+            <img src="assets/logo.png" alt="" width={52} height={52} />
+            <BrandText>
+              <strong>Kuzmanić</strong>
+              <span>{formatMessage({ id: "brand.tagline" })}</span>
+            </BrandText>
+          </Brand>
 
-        <DesktopNav aria-label={formatMessage({ id: "nav.label" })}>{navLinks}</DesktopNav>
+          <DesktopNav aria-label={formatMessage({ id: "nav.label" })}>{navLinks}</DesktopNav>
 
-        <HeaderRight>
-          <PhoneLink href={CONTACT.phoneHref}>
-            <PhoneIcon size={16} />
-            {CONTACT.phoneDisplay}
-          </PhoneLink>
-          <LanguageSwitcher />
-        </HeaderRight>
-
-        <MenuButton
-          ref={menuButtonRef}
-          type="button"
-          aria-expanded={isMenuOpen}
-          aria-controls="mobile-menu"
-          aria-label={formatMessage({ id: isMenuOpen ? "nav.close" : "nav.open" })}
-          onClick={() => setIsMenuOpen((open) => !open)}
-        >
-          {isMenuOpen ? <CloseIcon size={26} /> : <MenuIcon size={26} />}
-        </MenuButton>
-      </HeaderInner>
-
-      <AnimatePresence>
-        {isMenuOpen && (
-          <MobileMenu
-            id="mobile-menu"
-            aria-label={formatMessage({ id: "nav.label" })}
-            initial={{ opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.25 }}
-          >
-            {navLinks}
-            <MobileContact>
-              <a href={CONTACT.phoneHref}>
-                <PhoneIcon size={18} />
-                {CONTACT.phoneDisplay}
-              </a>
-              <a href={`mailto:${CONTACT.email}`}>
-                <MailIcon size={18} />
-                {CONTACT.email}
-              </a>
-            </MobileContact>
+          <HeaderRight>
+            <PhoneLink href={CONTACT.phoneHref}>
+              <PhoneIcon size={16} />
+              {CONTACT.phoneDisplay}
+            </PhoneLink>
             <LanguageSwitcher />
-          </MobileMenu>
-        )}
-      </AnimatePresence>
-    </HeaderBar>
+          </HeaderRight>
+
+          <MenuButton
+            ref={menuButtonRef}
+            type="button"
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
+            aria-label={formatMessage({ id: isMenuOpen ? "nav.close" : "nav.open" })}
+            onClick={() => setIsMenuOpen((open) => !open)}
+          >
+            {isMenuOpen ? <CloseIcon size={26} /> : <MenuIcon size={26} />}
+          </MenuButton>
+        </HeaderInner>
+
+        <AnimatePresence>
+          {isMenuOpen && (
+            <MobileMenu
+              id="mobile-menu"
+              aria-label={formatMessage({ id: "nav.label" })}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={mobileMenuVariants}
+            >
+              {navLinks.map((link) => (
+                <motion.div key={link.key} variants={mobileItemVariants}>
+                  {link}
+                </motion.div>
+              ))}
+              <MobileContact variants={mobileItemVariants}>
+                <a href={CONTACT.phoneHref}>
+                  <PhoneIcon size={18} />
+                  {CONTACT.phoneDisplay}
+                </a>
+                <a href={`mailto:${CONTACT.email}`}>
+                  <MailIcon size={18} />
+                  {CONTACT.email}
+                </a>
+              </MobileContact>
+              <motion.div variants={mobileItemVariants}>
+                <LanguageSwitcher />
+              </motion.div>
+            </MobileMenu>
+          )}
+        </AnimatePresence>
+      </HeaderBar>
+    </>
   );
 };
 
@@ -130,7 +157,27 @@ const LanguageSwitcher = () => {
   );
 };
 
-const HeaderBar = styled.header<{ $solid: boolean }>`
+const mobileMenuVariants = {
+  hidden: { opacity: 0, height: 0 },
+  visible: {
+    opacity: 1,
+    height: "auto",
+    transition: {
+      duration: 0.35,
+      ease: [0.22, 1, 0.36, 1],
+      staggerChildren: 0.06,
+      delayChildren: 0.1,
+    },
+  },
+  exit: { opacity: 0, height: 0, transition: { duration: 0.25 } },
+};
+
+const mobileItemVariants = {
+  hidden: { opacity: 0, y: -10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35 } },
+};
+
+const HeaderBar = styled(motion.header)<{ $solid: boolean }>`
   position: fixed;
   inset: 0 0 auto;
   z-index: 1100;
@@ -141,7 +188,20 @@ const HeaderBar = styled.header<{ $solid: boolean }>`
       : "linear-gradient(180deg, rgba(20, 6, 8, 0.7) 0%, rgba(20, 6, 8, 0) 100%)"};
   box-shadow: ${({ $solid }) => ($solid ? "0 6px 24px rgba(0, 0, 0, 0.25)" : "none")};
   backdrop-filter: ${({ $solid }) => ($solid ? "blur(10px)" : "none")};
-  transition: background 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+`;
+
+const ProgressBar = styled(motion.div)`
+  position: fixed;
+  z-index: 1200;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  transform-origin: 0 50%;
 `;
 
 const HeaderInner = styled.div`
@@ -290,7 +350,9 @@ const LangButton = styled.button`
   font-weight: 600;
   letter-spacing: 0.06em;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 
   &:hover {
     color: var(--white);
@@ -327,7 +389,13 @@ const MobileMenu = styled(motion.nav)`
   gap: 1.25rem;
   max-height: calc(100svh - var(--header-h));
   overflow-y: auto;
-  padding: 1.5rem 20px 2rem;
+  padding: 0 20px;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 0 0 0.5rem;
+  }
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 
   ${StyledNavLink} {
@@ -341,7 +409,7 @@ const MobileMenu = styled(motion.nav)`
   }
 `;
 
-const MobileContact = styled.div`
+const MobileContact = styled(motion.div)`
   display: flex;
   flex-direction: column;
   align-items: center;

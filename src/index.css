@@ -167,9 +167,32 @@ button {
   color: var(--wine-700);
 }
 
-/* react-toastify */
+/* react-toastify (set on the container so it wins over the library's :root defaults) */
+.Toastify {
+  --toastify-font-family: var(--font-ui);
+  --toastify-color-success: #2f6b3a;
+  --toastify-color-error: var(--error);
+  --toastify-color-progress-success: var(--gold);
+  --toastify-color-progress-error: var(--error);
+  --toastify-toast-bd-radius: var(--radius-sm);
+}
+
 .Toastify__toast {
   font-family: var(--font-ui);
+  color: var(--ink);
+  box-shadow: var(--shadow-md);
+  border-left: 4px solid var(--gold);
+}
+
+.Toastify__toast--error {
+  border-left-color: var(--error);
+}
+
+/* Slim, on-brand scrollbar on desktop browsers that support styling it. */
+@media (pointer: fine) {
+  html {
+    scrollbar-color: var(--wine-700) var(--cream);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

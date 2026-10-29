@@ -1,5 +1,7 @@
 import { useIntl } from "react-intl";
 import styled from "styled-components";
+import Reveal, { RevealItem } from "./Reveal";
+import RevealImage from "./RevealImage";
 import { Container, Divider, Eyebrow, Lead, MediaFrame, Section, SectionTitle } from "./ui";
 
 const AboutSectionTop = () => {
@@ -9,20 +11,21 @@ const AboutSectionTop = () => {
     <Section aria-labelledby="about-title">
       <Container>
         <Row>
-          <Text>
-            <Eyebrow>{formatMessage({ id: "about.eyebrow" })}</Eyebrow>
-            <SectionTitle id="about-title">{formatMessage({ id: "welcome.title" })}</SectionTitle>
+          <Text stagger={0.1}>
+            <RevealItem>
+              <Eyebrow>{formatMessage({ id: "about.eyebrow" })}</Eyebrow>
+              <SectionTitle id="about-title">{formatMessage({ id: "welcome.title" })}</SectionTitle>
+            </RevealItem>
             <Divider />
-            <Lead>{formatMessage({ id: "about.paragraph1" })}</Lead>
-            <p>{formatMessage({ id: "about.paragraph2" })}</p>
+            <RevealItem>
+              <Lead>{formatMessage({ id: "about.paragraph1" })}</Lead>
+            </RevealItem>
+            <RevealItem>
+              <p>{formatMessage({ id: "about.paragraph2" })}</p>
+            </RevealItem>
           </Text>
           <MediaFrame $ratio="4 / 3">
-            <img
-              src="assets/f4.jpeg"
-              alt={formatMessage({ id: "photo.f4" })}
-              loading="lazy"
-              decoding="async"
-            />
+            <RevealImage src="assets/f4.jpeg" alt={formatMessage({ id: "photo.f4" })} />
           </MediaFrame>
         </Row>
 
@@ -31,12 +34,7 @@ const AboutSectionTop = () => {
             <Quote>{formatMessage({ id: "about.paragraph3" })}</Quote>
           </Text>
           <MediaFrame $ratio="3 / 2" $offset="left">
-            <img
-              src="assets/f3.jpg"
-              alt={formatMessage({ id: "photo.f3" })}
-              loading="lazy"
-              decoding="async"
-            />
+            <RevealImage src="assets/f3.jpg" alt={formatMessage({ id: "photo.f3" })} />
           </MediaFrame>
         </Row>
       </Container>
@@ -72,7 +70,7 @@ const Row = styled.div<{ $reverse?: boolean }>`
   }
 `;
 
-const Text = styled.div`
+const Text = styled(Reveal)`
   max-width: 60ch;
 `;
 

@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { motion } from "framer-motion";
+import { fadeUp, inViewProps, staggerContainer } from "./motionVariants";
 import { useIntl } from "react-intl";
 import { CONTACT } from "../data/contact";
 import { NAV_ITEMS } from "../data/navigation";
@@ -12,16 +14,16 @@ const Footer: React.FC = () => {
 
   return (
     <FooterWrapper>
-      <FooterGrid>
-        <div>
+      <FooterGrid {...inViewProps} variants={staggerContainer(0.12)}>
+        <motion.div variants={fadeUp}>
           <FooterBrand>
             <img src="assets/logo.png" alt="" width={56} height={56} loading="lazy" />
             <span>{formatMessage({ id: "carousel.text1" })}</span>
           </FooterBrand>
           <FooterText>{formatMessage({ id: "footer.tagline" })}</FooterText>
-        </div>
+        </motion.div>
 
-        <div>
+        <motion.div variants={fadeUp}>
           <FooterHeading>{formatMessage({ id: "footer.contact" })}</FooterHeading>
           <FooterList>
             <li>
@@ -41,9 +43,9 @@ const Footer: React.FC = () => {
               <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
             </li>
           </FooterList>
-        </div>
+        </motion.div>
 
-        <nav aria-label={formatMessage({ id: "footer.explore" })}>
+        <motion.nav variants={fadeUp} aria-label={formatMessage({ id: "footer.explore" })}>
           <FooterHeading>{formatMessage({ id: "footer.explore" })}</FooterHeading>
           <FooterList>
             {NAV_ITEMS.map((item) => (
@@ -52,7 +54,7 @@ const Footer: React.FC = () => {
               </li>
             ))}
           </FooterList>
-        </nav>
+        </motion.nav>
       </FooterGrid>
 
       <FooterBottom>
@@ -67,13 +69,26 @@ const Footer: React.FC = () => {
 export default Footer;
 
 const FooterWrapper = styled.footer`
+  position: relative;
   background: var(--wine-950);
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: min(1180px, calc(100% - 40px));
+    height: 1px;
+    transform: translateX(-50%);
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.6;
+  }
   color: rgba(255, 255, 255, 0.78);
   font-family: var(--font-ui);
   font-size: 0.9375rem;
 `;
 
-const FooterGrid = styled.div`
+const FooterGrid = styled(motion.div)`
   display: grid;
   grid-template-columns: 1.4fr 1fr 0.8fr;
   gap: 3rem;

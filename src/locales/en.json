@@ -107,5 +107,14 @@
   "footer.tagline": "A family boutique winery on the slopes of Mount Kozjak, between Split and Trogir.",
   "footer.contact": "Contact",
   "footer.explore": "Explore",
-  "footer.text": "Kuzmanić Winery · Kaštel Novi"
+  "footer.text": "Kuzmanić Winery · Kaštel Novi",
+  "hero.scroll": "Scroll down",
+  "nav.top": "Back to top",
+  "stats.label": "The winery in numbers",
+  "stats.wines": "Indigenous wines",
+  "stats.handmade": "Handcrafted in the vineyard",
+  "stats.guests": "Guests per tour, at most",
+  "wine.class.premium": "Premium quality",
+  "wine.class.quality": "Quality wine",
+  "contact.sent": "Sent"
 }

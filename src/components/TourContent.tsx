@@ -1,7 +1,10 @@
-import React, { lazy } from "react";
+import React, { lazy, useRef } from "react";
 import { useIntl } from "react-intl";
 import Slider, { Settings } from "react-slick";
 import styled from "styled-components";
+import { motion, useScroll, useSpring } from "framer-motion";
+import Reveal from "./Reveal";
+import { fadeUp, fadeUpDelayed, inViewProps, staggerContainer } from "./motionVariants";
 import { CONTACT } from "../data/contact";
 import { TOUR_PHOTOS } from "../data/photos";
 import { usePrefersReducedMotion } from "../hooks/useMediaQuery";
@@ -37,6 +40,9 @@ const DETAILS = [
 const TourContent: React.FC = () => {
   const { formatMessage } = useIntl();
   const reducedMotion = usePrefersReducedMotion();
+  const stepsRef = useRef<HTMLOListElement>(null);
+  const { scrollYProgress } = useScroll({ target: stepsRef, offset: ["start 75%", "end 60%"] });
+  const lineProgress = useSpring(scrollYProgress, { stiffness: 120, damping: 30 });
 
   const sliderSettings: Settings = {
     dots: true,
@@ -70,11 +76,17 @@ const TourContent: React.FC = () => {
         eyebrow={formatMessage({ id: "tour.eyebrow" })}
         title={formatMessage({ id: "tour.start" })}
         subtitle={formatMessage({ id: "tour.subtitle" })}
+        scrollCue
       />
 
       <Section aria-labelledby="tour-program-title">
         <Container $narrow>
-          <SliderFrame aria-roledescription="carousel" aria-label={formatMessage({ id: "tour.photos" })}>
+          <SliderFrame
+            aria-roledescription="carousel"
+            aria-label={formatMessage({ id: "tour.photos" })}
+            {...inViewProps}
+            variants={fadeUp}
+          >
             <Slider {...sliderSettings}>
               {TOUR_PHOTOS.map((photo) => (
                 <Slide key={photo.src}>
@@ -94,15 +106,26 @@ const TourContent: React.FC = () => {
           </DeferredScene>
 
           <SectionHeader>
-            <Eyebrow>{formatMessage({ id: "tour.program.eyebrow" })}</Eyebrow>
-            <SectionTitle id="tour-program-title">{formatMessage({ id: "tour.program.title" })}</SectionTitle>
+            <Reveal>
+              <Eyebrow>{formatMessage({ id: "tour.program.eyebrow" })}</Eyebrow>
+              <SectionTitle id="tour-program-title">{formatMessage({ id: "tour.program.title" })}</SectionTitle>
+            </Reveal>
             <Divider />
           </SectionHeader>
 
-          <Steps>
+          <Steps ref={stepsRef}>
+            <StepsLine style={{ scaleY: lineProgress }} aria-hidden="true" />
             {STEPS.map((step, index) => (
-              <Step key={step.headingId}>
-                <StepNumber aria-hidden="true">{index + 1}</StepNumber>
+              <Step key={step.headingId} {...inViewProps} variants={fadeUp}>
+                <StepNumber
+                  aria-hidden="true"
+                  initial={{ scale: 0.4, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+                  transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.1 }}
+                >
+                  {index + 1}
+                </StepNumber>
                 <div>
                   <h3>{formatMessage({ id: step.headingId })}</h3>
                   <p>{formatMessage({ id: step.textId })}</p>
@@ -115,24 +138,31 @@ const TourContent: React.FC = () => {
 
       <Section $tone="cream" aria-labelledby="tour-info-title">
         <Container $narrow>
-          <DetailsCard>
+          <DetailsCard {...inViewProps} variants={fadeUp}>
             <h2 id="tour-info-title">{formatMessage({ id: "tour.label" })}</h2>
-            <DetailsList>
+            <DetailsList {...inViewProps} variants={staggerContainer(0.1, 0.2)}>
               {DETAILS.map(({ icon: Icon, labelId, valueId }) => (
-                <div key={labelId}>
+                <motion.div key={labelId} variants={fadeUpDelayed(0, 16)}>
                   <DetailIcon>
                     <Icon size={22} />
                   </DetailIcon>
                   <dt>{formatMessage({ id: labelId })}</dt>
                   <dd>{formatMessage({ id: valueId })}</dd>
-                </div>
+                </motion.div>
               ))}
             </DetailsList>
           </DetailsCard>
 
-          <ClosingText>{formatMessage({ id: "tour.end" })}</ClosingText>
+          <ClosingText {...inViewProps} variants={fadeUp}>
+            {formatMessage({ id: "tour.end" })}
+          </ClosingText>
 
-          <VisitCard>
+          <VisitCard
+            initial={{ opacity: 0, y: 40, scale: 0.96 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: "0px 0px -80px 0px" }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          >
             <img src="assets/logo.png" alt="" width={72} height={72} loading="lazy" />
             <h2>{formatMessage({ id: "tour.info" })}</h2>
             <p>
@@ -163,20 +193,35 @@ const TourContent: React.FC = () => {
 
 export default TourContent;
 
-const SliderFrame = styled.div`
+const SliderFrame = styled(motion.div)`
   margin-bottom: 1rem;
 
   .slick-slide > div {
     line-height: 0;
   }
+
+  .slick-list {
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Gentle Ken Burns drift on the visible slide. */
+  .slick-slide img {
+    transition: transform 6s ease-out;
+  }
+
+  .slick-active img {
+    transform: scale(1.06);
+  }
 `;
 
 const Slide = styled.div`
+  overflow: hidden;
+
   img {
     width: 100%;
     aspect-ratio: 16 / 10;
     object-fit: cover;
-    border-radius: var(--radius);
   }
 `;
 
@@ -199,7 +244,18 @@ const Steps = styled.ol`
   }
 `;
 
-const Step = styled.li`
+const StepsLine = styled(motion.span)`
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 22px;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--gold), var(--wine-700));
+  transform-origin: top;
+`;
+
+const Step = styled(motion.li)`
   position: relative;
   display: grid;
   grid-template-columns: 48px 1fr;
@@ -220,7 +276,7 @@ const Step = styled.li`
   }
 `;
 
-const StepNumber = styled.span`
+const StepNumber = styled(motion.span)`
   position: relative;
   display: grid;
   place-items: center;
@@ -235,7 +291,7 @@ const StepNumber = styled.span`
   box-shadow: 0 0 0 6px var(--white);
 `;
 
-const DetailsCard = styled.div`
+const DetailsCard = styled(motion.div)`
   position: relative;
   overflow: hidden;
   padding: clamp(1.75rem, 4vw, 3rem);
@@ -267,7 +323,7 @@ const DetailsCard = styled.div`
   }
 `;
 
-const DetailsList = styled.dl`
+const DetailsList = styled(motion.dl)`
   position: relative;
   z-index: 1;
   display: grid;
@@ -316,7 +372,7 @@ const DetailIcon = styled.span`
   color: var(--wine-700);
 `;
 
-const ClosingText = styled.p`
+const ClosingText = styled(motion.p)`
   max-width: 640px;
   margin: clamp(3rem, 6vw, 4.5rem) auto;
   text-align: center;
@@ -340,7 +396,7 @@ const ClosingText = styled.p`
   }
 `;
 
-const VisitCard = styled.div`
+const VisitCard = styled(motion.div)`
   max-width: 520px;
   margin: 0 auto;
   padding: clamp(2rem, 4vw, 2.75rem);

@@ -6,6 +6,7 @@ import AboutSectionTop from "./AboutSectionTop";
 import AboutSectionWine from "./AboutSectionWine";
 import ContactData from "./ContactData";
 import PageHero from "./PageHero";
+import StatsStrip from "./StatsStrip";
 import { ArrowRightIcon } from "./Icons";
 import { buttonGhostLight, buttonPrimary } from "./ui";
 
@@ -25,10 +26,11 @@ const MotionBg: React.FC = () => {
         eyebrow={formatMessage({ id: "home.hero.eyebrow" })}
         title={formatMessage({ id: "carousel.text2" })}
         subtitle={formatMessage({ id: "home.hero.subtitle" })}
+        scrollCue
       >
         <PrimaryLink to="/tour">
           {formatMessage({ id: "home.hero.cta.tour" })}
-          <ArrowRightIcon size={18} />
+          <ArrowRightIcon size={18} className="btn-arrow" />
         </PrimaryLink>
         <GhostButton type="button" onClick={scrollToContact}>
           {formatMessage({ id: "home.hero.cta.contact" })}
@@ -36,6 +38,7 @@ const MotionBg: React.FC = () => {
       </PageHero>
 
       <AboutSectionTop />
+      <StatsStrip />
 
       <PageHero
         image="assets/f2.jpg"

@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
+import { AnimatePresence, motion } from "framer-motion";
+import { EASE_OUT } from "../components/motionVariants";
 import { useIntl } from "react-intl";
 import PageHero from "../components/PageHero";
 import { ChevronLeftIcon, ChevronRightIcon, CloseIcon, ExpandIcon } from "../components/Icons";
@@ -10,6 +12,7 @@ import { useDocumentTitle } from "../hooks/useDocumentTitle";
 const GalleryPage: React.FC = () => {
   const { formatMessage } = useIntl();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [direction, setDirection] = useState(1);
   const triggerRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   useDocumentTitle(formatMessage({ id: "header.link3" }));
@@ -35,7 +38,13 @@ const GalleryPage: React.FC = () => {
             {GALLERY_PHOTOS.map((photo, index) => {
               const alt = formatMessage({ id: photo.altId });
               return (
-                <li key={photo.src}>
+                <motion.li
+                  key={photo.src}
+                  initial={{ opacity: 0, y: 32 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "0px 0px -60px 0px" }}
+                  transition={{ duration: 0.7, ease: EASE_OUT, delay: (index % 3) * 0.08 }}
+                >
                   <Thumb
                     ref={(el) => {
                       triggerRefs.current[index] = el;
@@ -49,16 +58,27 @@ const GalleryPage: React.FC = () => {
                       <ExpandIcon size={22} />
                     </ThumbOverlay>
                   </Thumb>
-                </li>
+                </motion.li>
               );
             })}
           </Grid>
         </Container>
       </Section>
 
-      {openIndex !== null && (
-        <Lightbox index={openIndex} onChange={setOpenIndex} onClose={close} />
-      )}
+      <AnimatePresence>
+        {openIndex !== null && (
+          <Lightbox
+            key="lightbox"
+            index={openIndex}
+            direction={direction}
+            onChange={(next, dir) => {
+              setDirection(dir);
+              setOpenIndex(next);
+            }}
+            onClose={close}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 };
@@ -67,11 +87,18 @@ export default GalleryPage;
 
 interface LightboxProps {
   index: number;
-  onChange: (index: number) => void;
+  direction: number;
+  onChange: (index: number, direction: number) => void;
   onClose: () => void;
 }
 
-const Lightbox: React.FC<LightboxProps> = ({ index, onChange, onClose }) => {
+const slideVariants = {
+  enter: (dir: number) => ({ opacity: 0, x: dir * 80, scale: 0.98 }),
+  center: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.45, ease: EASE_OUT } },
+  exit: (dir: number) => ({ opacity: 0, x: dir * -80, scale: 0.98, transition: { duration: 0.3 } }),
+};
+
+const Lightbox: React.FC<LightboxProps> = ({ index, direction, onChange, onClose }) => {
   const { formatMessage } = useIntl();
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -80,8 +107,8 @@ const Lightbox: React.FC<LightboxProps> = ({ index, onChange, onClose }) => {
   const photo = GALLERY_PHOTOS[index];
   const alt = formatMessage({ id: photo.altId });
 
-  const prev = useCallback(() => onChange((index - 1 + count) % count), [index, count, onChange]);
-  const next = useCallback(() => onChange((index + 1) % count), [index, count, onChange]);
+  const prev = useCallback(() => onChange((index - 1 + count) % count, -1), [index, count, onChange]);
+  const next = useCallback(() => onChange((index + 1) % count, 1), [index, count, onChange]);
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -129,6 +156,10 @@ const Lightbox: React.FC<LightboxProps> = ({ index, onChange, onClose }) => {
       aria-modal="true"
       aria-label={formatMessage({ id: "gallery.heading" })}
       onClick={onClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, pointerEvents: "none" }}
+      transition={{ duration: 0.3 }}
       onTouchStart={(e) => (touchStartX.current = e.touches[0].clientX)}
       onTouchEnd={onTouchEnd}
     >
@@ -148,8 +179,27 @@ const Lightbox: React.FC<LightboxProps> = ({ index, onChange, onClose }) => {
         <ChevronLeftIcon size={28} />
       </NavButton>
 
-      <Figure onClick={(e) => e.stopPropagation()}>
-        <img key={photo.src} src={photo.src} alt={alt} />
+      <Figure
+        onClick={(e) => e.stopPropagation()}
+        initial={{ scale: 0.94, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.96, y: 10 }}
+        transition={{ duration: 0.4, ease: EASE_OUT }}
+      >
+        <ImageStage>
+          <AnimatePresence initial={false} custom={direction} mode="popLayout">
+            <motion.img
+              key={photo.src}
+              src={photo.src}
+              alt={alt}
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+            />
+          </AnimatePresence>
+        </ImageStage>
         <figcaption>
           <span>{alt}</span>
           <span aria-live="polite">
@@ -172,16 +222,6 @@ const Lightbox: React.FC<LightboxProps> = ({ index, onChange, onClose }) => {
     </Overlay>
   );
 };
-
-const fadeIn = keyframes`
-  from { opacity: 0; }
-  to { opacity: 1; }
-`;
-
-const zoomIn = keyframes`
-  from { opacity: 0; transform: scale(0.97); }
-  to { opacity: 1; transform: scale(1); }
-`;
 
 const Grid = styled.ul`
   display: grid;
@@ -240,7 +280,7 @@ const Thumb = styled.button`
   }
 `;
 
-const Overlay = styled.div`
+const Overlay = styled(motion.div)`
   position: fixed;
   inset: 0;
   z-index: 1500;
@@ -249,28 +289,20 @@ const Overlay = styled.div`
   justify-content: center;
   padding: 72px 72px 24px;
   background: rgba(16, 6, 8, 0.94);
-  animation: ${fadeIn} 0.25s ease-out;
+  backdrop-filter: blur(6px);
 
   @media (max-width: 640px) {
     padding: 64px 12px 80px;
   }
 `;
 
-const Figure = styled.figure`
+const Figure = styled(motion.figure)`
   display: flex;
   flex-direction: column;
   align-items: center;
   max-width: 100%;
   max-height: 100%;
   margin: 0;
-
-  img {
-    max-width: 100%;
-    max-height: calc(100svh - 160px);
-    object-fit: contain;
-    border-radius: var(--radius-sm);
-    animation: ${zoomIn} 0.3s ease-out;
-  }
 
   figcaption {
     display: flex;
@@ -281,6 +313,21 @@ const Figure = styled.figure`
     font-family: var(--font-ui);
     font-size: 0.875rem;
     color: rgba(255, 255, 255, 0.8);
+  }
+`;
+
+const ImageStage = styled.div`
+  display: grid;
+  place-items: center;
+  max-width: 100%;
+
+  img {
+    grid-area: 1 / 1;
+    max-width: 100%;
+    max-height: calc(100svh - 160px);
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
   }
 `;
 

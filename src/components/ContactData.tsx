@@ -1,5 +1,5 @@
 import { useIntl } from "react-intl";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
@@ -8,7 +8,10 @@ import { toast } from "react-toastify";
 import { getVisitorCount, incrementVisitorCount, isVisitorCounterEnabled } from "../utils/redisClient";
 import { EMAIL_SERVICE_PUBLIC_KEY, EMAIL_SERVICE_SERVICE_ID, EMAIL_SERVICE_TEMPLATE_ID } from "../config";
 import { CONTACT } from "../data/contact";
-import { MailIcon, MapPinIcon, PhoneIcon, UserIcon } from "./Icons";
+import { motion } from "framer-motion";
+import { CheckIcon, MailIcon, MapPinIcon, PhoneIcon, UserIcon } from "./Icons";
+import Reveal from "./Reveal";
+import { fadeUp, inViewProps, staggerContainer } from "./motionVariants";
 import { buttonPrimary, Container, Divider, Eyebrow, Section, SectionHeader, SectionTitle } from "./ui";
 
 const markerIcon = new L.Icon({
@@ -39,6 +42,7 @@ const ContactData: React.FC = () => {
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<Partial<Record<FieldName, string>>>({});
   const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -107,6 +111,8 @@ const ContactData: React.FC = () => {
       );
       toast.success(formatMessage({ id: "contact.success" }));
       setFormData(EMPTY_FORM);
+      setSent(true);
+      window.setTimeout(() => setSent(false), 4000);
     } catch {
       toast.error(formatMessage({ id: "contact.error" }));
     } finally {
@@ -131,14 +137,18 @@ const ContactData: React.FC = () => {
     <Section id="contact" $tone="cream" tabIndex={-1} aria-labelledby="contact-title">
       <Container>
         <SectionHeader>
-          <Eyebrow>{formatMessage({ id: "contact.eyebrow" })}</Eyebrow>
-          <SectionTitle id="contact-title">{formatMessage({ id: "contact.heading" })}</SectionTitle>
+          <Reveal>
+            <Eyebrow>{formatMessage({ id: "contact.eyebrow" })}</Eyebrow>
+            <SectionTitle id="contact-title">{formatMessage({ id: "contact.heading" })}</SectionTitle>
+          </Reveal>
           <Divider />
-          <p>{formatMessage({ id: "contact.intro" })}</p>
+          <Reveal delay={0.15}>
+            <p>{formatMessage({ id: "contact.intro" })}</p>
+          </Reveal>
         </SectionHeader>
 
-        <ContactGrid>
-          <ContactLeftSide>
+        <ContactGrid {...inViewProps} variants={staggerContainer(0.15)}>
+          <ContactLeftSide variants={fadeUp}>
             <InfoCard>
               <h3>{formatMessage({ id: "contact.info.title" })}</h3>
               <InfoList>
@@ -186,7 +196,7 @@ const ContactData: React.FC = () => {
             </MapFrame>
           </ContactLeftSide>
 
-          <ContactForm ref={formRef} onSubmit={handleSubmit} noValidate>
+          <ContactForm ref={formRef} onSubmit={handleSubmit} noValidate variants={fadeUp}>
             <h3>{formatMessage({ id: "contact.title" })}</h3>
 
             <Field>
@@ -220,8 +230,12 @@ const ContactData: React.FC = () => {
               {renderError("verification")}
             </Field>
 
-            <SubmitButton type="submit" disabled={loading} aria-busy={loading}>
-              {formatMessage({ id: loading ? "contact.sending" : "contact.send" })}
+            <SubmitButton type="submit" disabled={loading} aria-busy={loading} $sent={sent}>
+              {loading && <Spinner aria-hidden="true" />}
+              {sent && !loading && <CheckIcon size={18} />}
+              {formatMessage({
+                id: loading ? "contact.sending" : sent ? "contact.sent" : "contact.send",
+              })}
             </SubmitButton>
           </ContactForm>
         </ContactGrid>
@@ -238,7 +252,7 @@ const ContactData: React.FC = () => {
 
 export default ContactData;
 
-const ContactGrid = styled.div`
+const ContactGrid = styled(motion.div)`
   display: grid;
   grid-template-columns: 1fr 1.15fr;
   gap: clamp(1.5rem, 4vw, 2.5rem);
@@ -249,7 +263,7 @@ const ContactGrid = styled.div`
   }
 `;
 
-const ContactLeftSide = styled.div`
+const ContactLeftSide = styled(motion.div)`
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -317,7 +331,7 @@ const MapFrame = styled.div`
   z-index: 0;
 `;
 
-const ContactForm = styled.form`
+const ContactForm = styled(motion.form)`
   ${cardStyles};
   display: flex;
   flex-direction: column;
@@ -378,8 +392,9 @@ const ErrorText = styled.span`
   color: var(--error);
 `;
 
-const SubmitButton = styled.button`
+const SubmitButton = styled.button<{ $sent: boolean }>`
   ${buttonPrimary};
+  ${({ $sent }) => $sent && "background: #2f6b3a; &:hover { background: #2f6b3a; }"}
   align-self: flex-start;
   min-width: 160px;
   margin-top: 0.25rem;
@@ -387,6 +402,19 @@ const SubmitButton = styled.button`
   @media (max-width: 480px) {
     align-self: stretch;
   }
+`;
+
+const spin = keyframes`
+  to { transform: rotate(360deg); }
+`;
+
+const Spinner = styled.span`
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: var(--white);
+  border-radius: 50%;
+  animation: ${spin} 0.8s linear infinite;
 `;
 
 const VisitorCounter = styled.p`
